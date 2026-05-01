@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ResuCraft - Professional Resume & Cover Letter Builder",
-  description: "Create stunning, ATS-friendly resumes and tailored cover letters in minutes with ResuCraft.",
+  title: "CV Craft - Professional Resume & Cover Letter Builder",
+  description: "Create stunning, ATS-friendly resumes and tailored cover letters in minutes with CV Craft.",
 };
 
 export default function RootLayout({

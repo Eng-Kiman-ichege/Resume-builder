@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { FileText, Sparkles, Layout, CheckCircle, ArrowRight, PenTool } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,7 +31,7 @@ export default function Home() {
             <div className="bg-primary text-primary-foreground p-1.5 rounded-lg">
               <FileText className="h-5 w-5" />
             </div>
-            <span className="font-bold text-xl tracking-tight">ResuCraft</span>
+            <span className="font-bold text-xl tracking-tight">CV Craft</span>
           </div>
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
             <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">Features</Link>
@@ -86,42 +87,8 @@ export default function Home() {
               transition={{ duration: 0.7, delay: 0.2 }}
               className="mt-16 relative mx-auto max-w-5xl"
             >
-              <div className="rounded-xl border bg-background shadow-2xl overflow-hidden aspect-[16/9] md:aspect-[21/9] flex flex-col">
-                <div className="border-b bg-muted/50 px-4 py-3 flex items-center gap-2">
-                  <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-                    <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-                    <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
-                  </div>
-                  <div className="mx-auto bg-background rounded-md text-xs px-3 py-1 border text-muted-foreground shadow-sm">
-                    resucraft.app/builder
-                  </div>
-                </div>
-                <div className="flex-1 bg-muted/20 p-8 flex gap-8">
-                  <div className="w-1/3 flex flex-col gap-4">
-                    <div className="h-8 bg-muted rounded w-1/2"></div>
-                    <div className="h-4 bg-muted rounded w-full"></div>
-                    <div className="h-4 bg-muted rounded w-5/6"></div>
-                    <div className="space-y-2 mt-4">
-                      <div className="h-10 bg-primary/10 border border-primary/20 rounded-md"></div>
-                      <div className="h-10 bg-muted rounded-md"></div>
-                      <div className="h-10 bg-muted rounded-md"></div>
-                    </div>
-                  </div>
-                  <div className="w-2/3 bg-background border shadow-sm rounded-lg p-6 flex flex-col gap-4">
-                    <div className="h-6 bg-muted rounded w-1/3 mx-auto"></div>
-                    <div className="h-3 bg-muted rounded w-1/4 mx-auto mt-2"></div>
-                    <div className="space-y-2 mt-6">
-                      <div className="h-2 bg-muted rounded w-full"></div>
-                      <div className="h-2 bg-muted rounded w-full"></div>
-                      <div className="h-2 bg-muted rounded w-4/5"></div>
-                    </div>
-                    <div className="space-y-2 mt-4">
-                      <div className="h-2 bg-muted rounded w-full"></div>
-                      <div className="h-2 bg-muted rounded w-5/6"></div>
-                    </div>
-                  </div>
-                </div>
+              <div className="rounded-xl border bg-background shadow-2xl overflow-hidden flex flex-col">
+                <Image src="/mockup.png" alt="CV Craft Builder Interface" width={1024} height={1024} className="w-full object-cover" priority />
               </div>
             </motion.div>
           </div>
@@ -195,7 +162,7 @@ export default function Home() {
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl md:text-5xl font-bold mb-6">Ready to get hired?</h2>
             <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-              Join thousands of job seekers who have successfully landed their dream roles using ResuCraft.
+              Join thousands of job seekers who have successfully landed their dream roles using CV Craft.
             </p>
             <Button size="lg" className="h-14 px-10 text-lg rounded-full">
               Build Your Resume Now
@@ -220,10 +187,10 @@ export default function Home() {
             <div className="bg-primary text-primary-foreground p-1 rounded-md">
               <FileText className="h-4 w-4" />
             </div>
-            <span className="font-bold text-lg tracking-tight">ResuCraft</span>
+            <span className="font-bold text-lg tracking-tight">CV Craft</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} ResuCraft. All rights reserved.
+            © {new Date().getFullYear()} CV Craft. All rights reserved.
           </p>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <Link href="#" className="hover:text-foreground transition-colors">Privacy Policy</Link>
