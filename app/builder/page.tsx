@@ -108,7 +108,7 @@ export default function BuilderPage() {
                     id="firstName" 
                     placeholder="e.g. John" 
                     className="bg-white dark:bg-black h-12 focus-visible:ring-blue-500 border-blue-500 ring-1 ring-blue-500" 
-                    value={formData.firstName}
+                    value={formData.firstName || ""}
                     onChange={handleChange}
                   />
                 </div>
@@ -118,7 +118,7 @@ export default function BuilderPage() {
                     id="surname" 
                     placeholder="e.g. Doe" 
                     className="bg-white dark:bg-black h-12" 
-                    value={formData.surname}
+                    value={formData.surname || ""}
                     onChange={handleChange}
                   />
                 </div>
@@ -127,26 +127,26 @@ export default function BuilderPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="postalCode" className="text-slate-600 dark:text-slate-400 font-medium">Postal Code</Label>
-                  <Input id="postalCode" placeholder="e.g. 00623" className="bg-white dark:bg-black h-12" value={formData.postalCode} onChange={handleChange} />
+                  <Input id="postalCode" placeholder="e.g. 00623" className="bg-white dark:bg-black h-12" value={formData.postalCode || ""} onChange={handleChange} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="city" className="text-slate-600 dark:text-slate-400 font-medium">City - Province</Label>
-                  <Input id="city" placeholder="e.g. Nairobi, Nairobi" className="bg-white dark:bg-black h-12" value={formData.city} onChange={handleChange} />
+                  <Input id="city" placeholder="e.g. Nairobi, Nairobi" className="bg-white dark:bg-black h-12" value={formData.city || ""} onChange={handleChange} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="country" className="text-slate-600 dark:text-slate-400 font-medium">Country</Label>
-                  <Input id="country" placeholder="e.g. Kenya" className="bg-white dark:bg-black h-12" value={formData.country} onChange={handleChange} />
+                  <Input id="country" placeholder="e.g. Kenya" className="bg-white dark:bg-black h-12" value={formData.country || ""} onChange={handleChange} />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="phone" className="text-slate-600 dark:text-slate-400 font-medium">Phone</Label>
-                  <Input id="phone" placeholder="e.g. +254-20553273" className="bg-white dark:bg-black h-12" value={formData.phone} onChange={handleChange} />
+                  <Input id="phone" placeholder="e.g. +254-20553273" className="bg-white dark:bg-black h-12" value={formData.phone || ""} onChange={handleChange} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-slate-600 dark:text-slate-400 font-medium">Email*</Label>
-                  <Input id="email" type="email" placeholder="e.g. user@example.com" className="bg-white dark:bg-black h-12" value={formData.email} onChange={handleChange} />
+                  <Input id="email" type="email" placeholder="e.g. user@example.com" className="bg-white dark:bg-black h-12" value={formData.email || ""} onChange={handleChange} />
                 </div>
               </div>
 
@@ -184,7 +184,7 @@ export default function BuilderPage() {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="profileLink" className="text-xs text-slate-400 uppercase">PROFILE LINK</Label>
-                        <Input id="profileLink" placeholder="e.g. linkedin.com/in/user" className="bg-white dark:bg-black h-11" value={formData.profileLink} onChange={handleChange} />
+                        <Input id="profileLink" placeholder="e.g. linkedin.com/in/user" className="bg-white dark:bg-black h-11" value={formData.profileLink || ""} onChange={handleChange} />
                       </div>
                     </div>
                   )}

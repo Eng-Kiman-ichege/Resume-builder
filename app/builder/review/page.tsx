@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useResume } from "@/lib/context/ResumeContext";
 import { ResumePreview } from "@/components/ResumePreview";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { 
   ArrowLeft, Download, CheckCircle2, Share2, Printer, 
   Settings2, Type, Palette, Layout, Mail, SpellCheck, 
-  Plus, Edit2, ChevronDown 
+  Plus, Edit2, ChevronDown, FileText, Loader2 
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,6 +19,30 @@ export default function ReviewPage() {
   const { resumeData, updateSection } = useResume();
   const [activeTab, setActiveTab] = useState<"design" | "formatting">("design");
   const [editingPart, setEditingPart] = useState<"accent" | "title" | "layout">("accent");
+  const [dbTemplates, setDbTemplates] = useState<any[]>([]);
+  const [loadingTemplates, setLoadingTemplates] = useState(true);
+
+  useEffect(() => {
+    fetchTemplates();
+  }, []);
+
+  const fetchTemplates = async () => {
+    try {
+      const res = await fetch("/api/templates");
+      if (res.ok) {
+        const data = await res.json();
+        // Fallback to initial templates if DB is empty for now
+        setDbTemplates(data.length > 0 ? data : templates);
+      } else {
+        setDbTemplates(templates);
+      }
+    } catch (err) {
+      console.error(err);
+      setDbTemplates(templates);
+    } finally {
+      setLoadingTemplates(false);
+    }
+  };
 
   const handleColorChange = (color: string) => {
     const fieldMap = {
@@ -125,65 +150,112 @@ export default function ReviewPage() {
                       ))}
                     </div>
                   </div>
-                  <div className="grid grid-cols-4 gap-3">
-                    {colors.map((color) => {
-                      const fieldMap = {
-                        accent: "color",
-                        title: "titleColor",
-                        layout: "backgroundColor"
-                      };
-                      const field = fieldMap[editingPart] as keyof typeof resumeData.settings;
-                      const isActive = resumeData.settings?.[field] === color;
+                  <div className="flex flex-col gap-4">
+                    <div className="grid grid-cols-4 gap-3">
+                      {colors.map((color) => {
+                        const fieldMap = {
+                          accent: "color",
+                          title: "titleColor",
+                          layout: "backgroundColor"
+                        };
+                        const field = fieldMap[editingPart] as keyof typeof resumeData.settings;
+                        const isActive = resumeData.settings?.[field] === color;
 
-                      return (
-                        <button
-                          key={color}
-                          onClick={() => handleColorChange(color)}
-                          className={cn(
-                            "w-10 h-10 rounded-full border-2 transition-all flex items-center justify-center relative group",
-                            isActive ? "border-white scale-110 shadow-lg" : "border-transparent hover:scale-105"
-                          )}
-                          style={{ backgroundColor: color }}
-                        >
-                          {isActive && (
-                            <div className="bg-white rounded-full p-0.5">
-                              <CheckCircle2 className="h-3 w-3 text-slate-900" />
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
+                        return (
+                          <button
+                            key={color}
+                            onClick={() => handleColorChange(color)}
+                            className={cn(
+                              "w-10 h-10 rounded-full border-2 transition-all flex items-center justify-center relative group",
+                              isActive ? "border-white scale-110 shadow-lg" : "border-transparent hover:scale-105"
+                            )}
+                            style={{ backgroundColor: color }}
+                          >
+                            {isActive && (
+                              <div className="bg-white rounded-full p-0.5">
+                                <CheckCircle2 className="h-3 w-3 text-slate-900" />
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    
+                    {/* Custom Color Picker */}
+                    <div className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10">
+                      <div className="relative w-10 h-10 shrink-0">
+                        <input 
+                          type="color" 
+                          value={resumeData.settings?.[editingPart === "accent" ? "color" : (editingPart === "title" ? "titleColor" : "backgroundColor")] || "#3b82f6"}
+                          onChange={(e) => handleColorChange(e.target.value)}
+                          className="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10"
+                        />
+                        <div 
+                          className="w-full h-full rounded-lg border border-white/20 shadow-inner"
+                          style={{ backgroundColor: resumeData.settings?.[editingPart === "accent" ? "color" : (editingPart === "title" ? "titleColor" : "backgroundColor")] || "#3b82f6" }}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Custom Hex</p>
+                        <Input 
+                          value={resumeData.settings?.[editingPart === "accent" ? "color" : (editingPart === "title" ? "titleColor" : "backgroundColor")] || "#3b82f6"}
+                          onChange={(e) => handleColorChange(e.target.value)}
+                          className="h-8 bg-transparent border-white/10 text-xs font-mono text-white"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </section>
 
                 <section>
                   <h3 className="text-lg font-bold mb-4">Templates</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    {templates.map((template) => (
-                      <div 
-                        key={template.id}
-                        onClick={() => handleTemplateChange(template.id)}
-                        className={cn(
-                          "cursor-pointer rounded-lg border-2 overflow-hidden transition-all relative group",
-                          resumeData.settings?.templateId === template.id ? "border-green-400 ring-2 ring-green-400/20" : "border-transparent opacity-80 hover:opacity-100"
-                        )}
-                      >
-                        <img 
-                          src={template.thumbnail} 
-                          alt={template.name}
-                          className="w-full aspect-[1/1.414] object-cover"
-                        />
-                        {resumeData.settings?.templateId === template.id && (
-                          <div className="absolute top-2 right-2 bg-green-400 rounded-full p-0.5 shadow-lg">
-                            <CheckCircle2 className="h-4 w-4 text-white" />
+                  {loadingTemplates ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="h-6 w-6 animate-spin text-blue-400" />
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-4">
+                      {dbTemplates.map((template) => (
+                        <div 
+                          key={template.id}
+                          onClick={() => handleTemplateChange(template.id)}
+                          className={cn(
+                            "cursor-pointer rounded-lg border-2 overflow-hidden transition-all relative group bg-white",
+                            resumeData.settings?.templateId === template.id ? "border-green-400 ring-2 ring-green-400/20" : "border-transparent opacity-80 hover:opacity-100"
+                          )}
+                        >
+                          <div className="w-[100%] aspect-[1/1.414] relative origin-top overflow-hidden">
+                            {template.thumbnail && template.is_pdf ? (
+                              <iframe 
+                                src={template.thumbnail + "#toolbar=0&navpanes=0&scrollbar=0"} 
+                                className="w-full h-full border-none pointer-events-none scale-[1.5] origin-top"
+                                title={template.name}
+                              />
+                            ) : (
+                              <div className="absolute inset-0 pointer-events-none transform scale-[0.3] origin-top-left w-[333%] h-[333%]">
+                                 <ResumePreview 
+                                   customTemplateId={template.id} 
+                                 />
+                              </div>
+                            )}
                           </div>
-                        )}
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <span className="text-[10px] font-bold uppercase tracking-wider">Select</span>
+
+                          <div className="absolute inset-x-0 bottom-0 bg-slate-900/90 p-1.5 border-t border-white/10 z-20">
+                             <p className="text-[8px] font-bold text-center truncate w-full text-slate-300">{template.name}</p>
+                          </div>
+                          
+                          {resumeData.settings?.templateId === template.id && (
+                            <div className="absolute top-2 right-2 bg-green-400 rounded-full p-0.5 shadow-lg z-30">
+                              <CheckCircle2 className="h-4 w-4 text-white" />
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20">
+                            <span className="text-[10px] font-bold uppercase tracking-wider">Select</span>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </section>
               </>
             ) : (
