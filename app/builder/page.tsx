@@ -8,8 +8,68 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import Link from "next/link";
 
+import { useRouter } from "next/navigation";
+import { Wand2 } from "lucide-react";
+
+import { useResume } from "@/lib/context/ResumeContext";
+import { ResumePreview } from "@/components/ResumePreview";
+
 export default function BuilderPage() {
+  const router = useRouter();
+  const { resumeData, updateSection } = useResume();
   const [includeProfile, setIncludeProfile] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  
+  const formData = resumeData.header;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { id, value } = e.target;
+    updateSection("header", { ...formData, [id]: value });
+  };
+
+  const handleSaveAndContinue = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/resume/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ section: "header", data: formData })
+      });
+      
+      if (response.status === 401) {
+        // Redirect to Clerk sign-in
+        router.push("/sign-in?redirect_url=" + window.location.href);
+        return;
+      }
+
+      if (response.ok) {
+        router.push("/builder/experience-intro");
+      }
+    } catch (error) {
+      console.error("Save error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getAiHelp = async () => {
+    setAiLoading(true);
+    try {
+      const response = await fetch("/api/ai/suggestions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ section: "header", data: formData })
+      });
+      const data = await response.json();
+      alert(data.suggestions || "AI suggested no changes.");
+    } catch (error) {
+      console.error("AI error:", error);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
 
   return (
     <div className="flex flex-col h-full w-full bg-white dark:bg-zinc-950">
@@ -19,13 +79,25 @@ export default function BuilderPage() {
         {/* Left Side: Form */}
         <div className="w-full lg:w-1/2 xl:w-7/12 flex flex-col h-full overflow-y-auto px-8 md:px-12 pt-12 pb-32">
           <div className="max-w-2xl w-full mx-auto space-y-8">
-            <div>
-              <h1 className="text-4xl font-extrabold tracking-tight mb-3 text-slate-900 dark:text-white">
-                Let&apos;s start with your header
-              </h1>
-              <p className="text-lg text-slate-600 dark:text-slate-400">
-                Include your full name and multiple ways for employers to reach you.
-              </p>
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 className="text-4xl font-extrabold tracking-tight mb-3 text-slate-900 dark:text-white">
+                  Let&apos;s start with your header
+                </h1>
+                <p className="text-lg text-slate-600 dark:text-slate-400">
+                  Include your full name and multiple ways for employers to reach you.
+                </p>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={getAiHelp}
+                disabled={aiLoading}
+                className="gap-2 border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100"
+              >
+                <Wand2 className="h-4 w-4" />
+                {aiLoading ? "Thinking..." : "AI Help"}
+              </Button>
             </div>
 
             <div className="bg-slate-50 dark:bg-zinc-900 p-8 rounded-xl border border-slate-100 dark:border-zinc-800 space-y-6">
@@ -36,7 +108,8 @@ export default function BuilderPage() {
                     id="firstName" 
                     placeholder="e.g. John" 
                     className="bg-white dark:bg-black h-12 focus-visible:ring-blue-500 border-blue-500 ring-1 ring-blue-500" 
-                    defaultValue="John"
+                    value={formData.firstName}
+                    onChange={handleChange}
                   />
                 </div>
                 <div className="space-y-2">
@@ -45,7 +118,8 @@ export default function BuilderPage() {
                     id="surname" 
                     placeholder="e.g. Doe" 
                     className="bg-white dark:bg-black h-12" 
-                    defaultValue="Doe"
+                    value={formData.surname}
+                    onChange={handleChange}
                   />
                 </div>
               </div>
@@ -53,26 +127,26 @@ export default function BuilderPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="postalCode" className="text-slate-600 dark:text-slate-400 font-medium">Postal Code</Label>
-                  <Input id="postalCode" placeholder="e.g. 00623" className="bg-white dark:bg-black h-12" />
+                  <Input id="postalCode" placeholder="e.g. 00623" className="bg-white dark:bg-black h-12" value={formData.postalCode} onChange={handleChange} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="city" className="text-slate-600 dark:text-slate-400 font-medium">City - Province</Label>
-                  <Input id="city" placeholder="e.g. Nairobi, Nairobi" className="bg-white dark:bg-black h-12" />
+                  <Input id="city" placeholder="e.g. Nairobi, Nairobi" className="bg-white dark:bg-black h-12" value={formData.city} onChange={handleChange} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="country" className="text-slate-600 dark:text-slate-400 font-medium">Country</Label>
-                  <Input id="country" placeholder="e.g. Kenya" className="bg-white dark:bg-black h-12" />
+                  <Input id="country" placeholder="e.g. Kenya" className="bg-white dark:bg-black h-12" value={formData.country} onChange={handleChange} />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="phone" className="text-slate-600 dark:text-slate-400 font-medium">Phone</Label>
-                  <Input id="phone" placeholder="e.g. +254-20553273" className="bg-white dark:bg-black h-12" />
+                  <Input id="phone" placeholder="e.g. +254-20553273" className="bg-white dark:bg-black h-12" value={formData.phone} onChange={handleChange} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-slate-600 dark:text-slate-400 font-medium">Email*</Label>
-                  <Input id="email" type="email" placeholder="e.g. user@example.com" className="bg-white dark:bg-black h-12" />
+                  <Input id="email" type="email" placeholder="e.g. user@example.com" className="bg-white dark:bg-black h-12" value={formData.email} onChange={handleChange} />
                 </div>
               </div>
 
@@ -93,17 +167,25 @@ export default function BuilderPage() {
                   </div>
                   
                   {includeProfile && (
-                    <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                      <Label htmlFor="profile-label" className="text-xs text-slate-400">PROFILE LABEL</Label>
-                      <select 
-                        id="profile-label" 
-                        className="w-full h-11 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        <option value="linkedin">LinkedIn</option>
-                        <option value="github">GitHub</option>
-                        <option value="portfolio">Portfolio Website</option>
-                        <option value="twitter">Twitter</option>
-                      </select>
+                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="space-y-2">
+                        <Label htmlFor="profileLabel" className="text-xs text-slate-400 uppercase">PROFILE LABEL</Label>
+                        <select 
+                          id="profileLabel" 
+                          value={formData.profileLabel}
+                          onChange={handleChange}
+                          className="w-full h-11 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <option value="linkedin">LinkedIn</option>
+                          <option value="github">GitHub</option>
+                          <option value="portfolio">Portfolio Website</option>
+                          <option value="twitter">Twitter</option>
+                        </select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="profileLink" className="text-xs text-slate-400 uppercase">PROFILE LINK</Label>
+                        <Input id="profileLink" placeholder="e.g. linkedin.com/in/user" className="bg-white dark:bg-black h-11" value={formData.profileLink} onChange={handleChange} />
+                      </div>
                     </div>
                   )}
                 </div>
@@ -114,60 +196,13 @@ export default function BuilderPage() {
 
         {/* Right Side: Live Preview */}
         <div className="hidden lg:flex w-1/2 xl:w-5/12 bg-slate-100 dark:bg-zinc-900/50 border-l border-slate-200 dark:border-zinc-800 flex-col items-center justify-center p-8 relative">
+          <ResumePreview />
           
-          <div className="w-full max-w-md aspect-[1/1.414] bg-white shadow-xl rounded-sm border border-slate-200 relative overflow-hidden transition-all hover:scale-[1.02] duration-300">
-            {/* Mock Resume Content */}
-            <div className="p-8 h-full flex flex-col text-slate-800">
-              <div className="text-center mb-6 border-b border-orange-200 pb-4">
-                <div className="w-12 h-12 mx-auto border border-slate-300 rounded-full flex items-center justify-center text-lg font-serif mb-2">
-                  JD
-                </div>
-                <h2 className="text-2xl font-serif tracking-widest uppercase">John Doe</h2>
-                <div className="mt-2 text-[10px] text-orange-500 uppercase tracking-widest border border-orange-200 py-1 bg-orange-50/50">
-                  user@example.com | +254-20553273 | Nairobi, Kenya
-                </div>
-              </div>
-              
-              <div className="flex-1 text-[8px] leading-tight flex flex-col gap-4">
-                <div>
-                  <h3 className="font-bold border-b border-slate-200 mb-1 pb-1">Summary</h3>
-                  <p className="text-slate-500">Customer-focused professional with solid understanding of dynamics, marketing and customer service. Offering five years of experience providing quality product recommendations and solutions to meet customer needs and exceed expectations.</p>
-                </div>
-                
-                <div>
-                  <h3 className="font-bold border-b border-slate-200 mb-1 pb-1">Skills</h3>
-                  <div className="grid grid-cols-2 text-slate-500 gap-1">
-                    <div>• Customer Service</div>
-                    <div>• Retail Sales</div>
-                    <div>• Point of Sale Systems</div>
-                    <div>• Inventory Management</div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-bold border-b border-slate-200 mb-1 pb-1">Experience</h3>
-                  <div className="mb-2 text-slate-500">
-                    <div className="flex justify-between font-semibold text-slate-700">
-                      <span>Retail Sales Associate</span>
-                      <span>2019 - Present</span>
-                    </div>
-                    <div>• Increased monthly sales by 10% through up-selling and cross-selling.</div>
-                    <div>• Prevented store losses by leveraging awareness and attention to detail.</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Zoom Button */}
-            <button className="absolute bottom-4 right-4 w-12 h-12 bg-orange-200 hover:bg-orange-300 rounded-full shadow-lg flex items-center justify-center text-orange-900 transition-colors">
-              <ZoomIn className="h-5 w-5" />
-            </button>
-          </div>
-
           <button className="mt-8 text-blue-600 dark:text-blue-400 font-bold hover:underline transition-all">
             Change template
           </button>
         </div>
+
       </div>
 
       {/* Bottom Sticky Footer */}
@@ -178,11 +213,13 @@ export default function BuilderPage() {
             Back
           </Button>
         </Link>
-        <Link href="/builder/experience-intro">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-10 h-12 rounded-full text-lg shadow-md transition-all hover:shadow-lg">
-            Continue
-          </Button>
-        </Link>
+        <Button 
+          onClick={handleSaveAndContinue}
+          disabled={loading}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-10 h-12 rounded-full text-lg shadow-md transition-all hover:shadow-lg disabled:opacity-50"
+        >
+          {loading ? "Saving..." : "Continue"}
+        </Button>
       </div>
     </div>
   );

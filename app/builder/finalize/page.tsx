@@ -5,9 +5,32 @@ import { X, Check, ArrowRight, Rocket, Star, ShieldCheck, Flag } from "lucide-re
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { ResumePreview } from "@/components/ResumePreview";
+import { useResume } from "@/lib/context/ResumeContext";
 
 export default function FinalizePage() {
   const [showModal, setShowModal] = useState(true);
+  const { resumeData } = useResume();
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  const analyzeResume = async () => {
+    setIsAnalyzing(true);
+    try {
+      const response = await fetch("/api/ai/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resumeData })
+      });
+      const data = await response.json();
+      setAiAnalysis(data.analysis);
+    } catch (error) {
+      console.error("Analysis error:", error);
+      setAiAnalysis("Your resume looks strong! Consider adding more specific impact metrics (e.g., 'Increased revenue by 15%') to your experience section.");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full w-full bg-slate-100 dark:bg-zinc-950 relative overflow-hidden">
@@ -32,104 +55,85 @@ export default function FinalizePage() {
           </div>
 
           <div className="w-full max-w-xl aspect-[1/1.414] bg-white shadow-2xl rounded-sm border border-slate-200 relative overflow-hidden transition-all duration-300">
-            {/* Mock Resume Content */}
-            <div className="p-10 h-full flex flex-col text-slate-800">
-              <div className="text-center mb-8 pb-6">
-                <div className="w-16 h-16 mx-auto border border-slate-300 rounded-full flex items-center justify-center text-2xl font-serif mb-4">
-                  FK
-                </div>
-                <h2 className="text-3xl font-serif tracking-widest uppercase font-bold">Fifa Kim</h2>
-                <div className="mt-3 text-xs text-slate-500 uppercase tracking-widest">
-                  kim99012@gmail.com | 0799849023 | NAIROBI Kenya
-                </div>
-              </div>
-              
-              <div className="flex-1 text-[10px] leading-relaxed flex flex-col gap-6">
-                <div>
-                  <h3 className="font-bold border-b border-slate-200 mb-2 pb-1 text-sm uppercase">Summary</h3>
-                  <p className="text-slate-500">Customer-focused Retail Sales professional with solid understanding of retail dynamics, marketing and customer service. Offering five years of experience providing quality product recommendations and solutions to meet customer needs and exceed expectations. Demonstrated record of exceeding revenue targets by leveraging communication skills and sales expertise.</p>
-                </div>
-                
-                <div>
-                  <h3 className="font-bold border-b border-slate-200 mb-2 pb-1 text-sm uppercase">Skills</h3>
-                  <div className="grid grid-cols-2 text-slate-500 gap-2">
-                    <div>• Interpersonal communication</div>
-                    <div>• Maintenance & repair</div>
-                    <div>• Analytical thinking</div>
-                    <div>• Team Collaboration</div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-bold border-b border-slate-200 mb-3 pb-1 text-sm uppercase">Experience</h3>
-                  <div className="mb-4 text-slate-500 grid grid-cols-[1fr_2fr] gap-6">
-                    <div>
-                      <div className="font-bold text-slate-700">Retail Sales Associate</div>
-                      <div className="italic text-slate-400">Kilimani, Nairobi, Kenya</div>
-                      <div className="text-slate-400 mt-1">02/2017 - Current</div>
-                    </div>
-                    <div className="space-y-2">
-                      <div>• Increased monthly sales by 10% by effectively upselling and cross-selling products to maximize profitability.</div>
-                      <div>• Prevented store losses by leveraging awareness, attention to detail and integrity to identify and investigate concerns.</div>
-                      <div>• Processed payments and maintained accurate drawers to meet financial targets.</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-bold border-b border-slate-200 mb-3 pb-1 text-sm uppercase">Education and Training</h3>
-                  <div className="mb-4 text-slate-500">
-                    <div className="font-bold text-slate-700">Kamukunji Secondary School | Nairobi, Kenya</div>
-                    <div>KCSE mean grade C</div>
-                    <div className="text-slate-400 mt-1">06/2013</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ResumePreview />
           </div>
+
         </div>
 
         {/* Right Side: Status Panel */}
-        <div className="hidden lg:flex w-80 bg-slate-200/50 dark:bg-zinc-900 border-l border-slate-200 dark:border-zinc-800 flex-col py-8 px-6 relative z-10">
+        <div className="hidden lg:flex w-96 bg-white dark:bg-zinc-900 border-l border-slate-200 dark:border-zinc-800 flex-col py-8 px-6 relative z-10 overflow-y-auto custom-scrollbar">
           
           {/* Top Progress Pills */}
-          <div className="flex flex-wrap gap-2 mb-16 justify-center">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-200/50 dark:bg-indigo-900/30 text-indigo-900 dark:text-indigo-300 rounded-full text-xs font-semibold">
-              Header <Check className="h-3 w-3" />
+          <div className="flex flex-wrap gap-2 mb-10 justify-center">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-xs font-semibold">
+              Ready <Check className="h-3 w-3" />
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 dark:bg-zinc-800 text-slate-600 dark:text-slate-300 rounded-full text-xs font-semibold">
-              Experience <Check className="h-3 w-3" />
-            </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 dark:bg-zinc-800 text-slate-600 dark:text-slate-300 rounded-full text-xs font-semibold">
-              Education <Check className="h-3 w-3" />
-            </div>
-            <button className="flex items-center justify-center w-7 h-7 rounded-full border border-slate-400 dark:border-zinc-600 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors">
-              <ArrowRight className="h-3.5 w-3.5" />
-            </button>
           </div>
 
-          <div className="flex-1 flex flex-col items-center justify-center text-center -mt-20">
-            {/* Illustration Mockup */}
-            <div className="w-40 h-40 mb-6 relative">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Flag className="h-24 w-24 text-blue-500" strokeWidth={1} />
-                <div className="absolute top-4 right-4 animate-bounce delay-100">
-                  <Star className="h-6 w-6 text-amber-400 fill-amber-400" />
-                </div>
-                <div className="absolute bottom-8 left-4 animate-bounce delay-300">
-                  <Star className="h-4 w-4 text-blue-400 fill-blue-400" />
-                </div>
-              </div>
-            </div>
+          <div className="flex flex-col items-center text-center mb-10">
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 italic">Finish Line!</h3>
+            <p className="text-slate-600 dark:text-slate-400 text-sm mb-6">Your resume is looking sharp.</p>
             
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">You did it!</h3>
-            <p className="text-slate-600 dark:text-slate-400 text-sm mb-8">Your resume is ready.</p>
-            
-            <Link href="/editor">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-10 h-12 rounded-full shadow-md hover:shadow-lg transition-all">
-                Continue to Editor
+            <Link href="/builder/review" className="w-full">
+              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 rounded-full shadow-lg shadow-blue-900/20">
+                Proceed to Review
               </Button>
             </Link>
+          </div>
+
+          <div className="h-px bg-slate-100 dark:bg-zinc-800 my-8" />
+
+          {/* AI Analysis Section */}
+          <section className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <ShieldCheck className="h-5 w-5 text-indigo-500" />
+              <h4 className="font-bold text-slate-900 dark:text-white uppercase tracking-widest text-xs">AI Resume Analysis</h4>
+            </div>
+
+            <div className="bg-indigo-50 dark:bg-indigo-900/20 p-5 rounded-2xl border border-indigo-100 dark:border-indigo-900/30">
+              {aiAnalysis ? (
+                <div className="space-y-4">
+                  <div className="text-sm text-indigo-900 dark:text-indigo-200 leading-relaxed italic">
+                    "{aiAnalysis}"
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-300 h-10"
+                    onClick={analyzeResume}
+                    disabled={isAnalyzing}
+                  >
+                    {isAnalyzing ? "Analyzing..." : "Re-analyze"}
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center text-center gap-4">
+                  <Rocket className="h-10 w-10 text-indigo-400 opacity-40" />
+                  <p className="text-xs text-indigo-700 dark:text-indigo-400 px-4">
+                    Get professional suggestions from our AI to beat the ATS scan.
+                  </p>
+                  <Button 
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white h-12 rounded-xl shadow-md"
+                    onClick={analyzeResume}
+                    disabled={isAnalyzing}
+                  >
+                    {isAnalyzing ? "Analyzing..." : "Analyze Now"}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </section>
+
+          <div className="mt-auto pt-10">
+            <div className="bg-amber-50 dark:bg-amber-900/10 p-5 rounded-2xl border border-amber-100 dark:border-amber-900/20">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-amber-900 dark:text-amber-200">Resume Strength</span>
+                <span className="text-xs font-bold text-amber-600 dark:text-amber-400">85%</span>
+              </div>
+              <div className="w-full bg-amber-200 dark:bg-amber-900/40 h-1.5 rounded-full overflow-hidden">
+                <div className="bg-amber-500 h-full w-[85%] rounded-full transition-all duration-1000" />
+              </div>
+            </div>
           </div>
         </div>
       </div>

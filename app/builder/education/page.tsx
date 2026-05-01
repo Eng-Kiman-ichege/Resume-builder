@@ -8,8 +8,143 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 
+import { useRouter } from "next/navigation";
+import { Wand2, Trash2, Plus } from "lucide-react";
+
+import { useResume } from "@/lib/context/ResumeContext";
+import { ResumePreview } from "@/components/ResumePreview";
+
 export default function EducationPage() {
+  const router = useRouter();
+  const { resumeData, updateSection } = useResume();
   const [stillEnrolled, setStillEnrolled] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    institution: "",
+    location: "",
+    degree: "",
+    field: "",
+    gradMonth: "",
+    gradYear: ""
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleDelete = async (index: number) => {
+    const updatedEducation = resumeData.education.filter((_: any, i: number) => i !== index);
+    updateSection("education", updatedEducation);
+    
+    try {
+      await fetch("/api/resume/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ section: "education", data: updatedEducation })
+      });
+    } catch (error) {
+      console.error("Delete error:", error);
+    }
+  };
+
+  const handleAddAnother = async () => {
+    if (!formData.institution || !formData.degree || !formData.gradYear) {
+      alert("Please fill in the Institution, Degree, and Graduation Year to add an education entry.");
+      return;
+    }
+
+    const newEducation = { ...formData, isStillEnrolled: stillEnrolled };
+    
+    // Use functional update to avoid stale state issues during rapid saves
+    updateSection("education", (prev: any[]) => {
+      const updated = [...(Array.isArray(prev) ? prev : []), newEducation];
+      
+      // Save to DB in the background
+      fetch("/api/resume/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ section: "education", data: updated })
+      }).catch(err => console.error("Save error:", err));
+      
+      return updated;
+    });
+
+    // Clear form
+    setFormData({
+      institution: "",
+      location: "",
+      degree: "",
+      field: "",
+      gradMonth: "",
+      gradYear: ""
+    });
+    setStillEnrolled(false);
+  };
+
+  const handleSaveAndContinue = async () => {
+    const isFormEmpty = !formData.institution && !formData.degree && !formData.gradYear;
+    const hasExistingEntries = resumeData.education.length > 0;
+
+    if (isFormEmpty) {
+      if (hasExistingEntries) {
+        router.push("/builder/skills-intro");
+        return;
+      } else {
+        alert("Please add at least one education entry.");
+        return;
+      }
+    }
+
+    setLoading(true);
+    try {
+      const newEducation = { ...formData, isStillEnrolled: stillEnrolled };
+      const currentEducation = Array.isArray(resumeData.education) ? resumeData.education : [];
+      const updatedEducation = [...currentEducation, newEducation];
+      
+      updateSection("education", updatedEducation);
+
+      const response = await fetch("/api/resume/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ section: "education", data: updatedEducation })
+      });
+      
+      if (response.status === 401) {
+        router.push("/sign-in?redirect_url=" + window.location.href);
+        return;
+      }
+
+      if (response.ok) {
+        router.push("/builder/skills-intro");
+      }
+    } catch (error) {
+      console.error("Save error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+
+
+  const getAiHelp = async () => {
+    setAiLoading(true);
+    try {
+      const response = await fetch("/api/ai/suggestions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ section: "education", data: formData })
+      });
+      const data = await response.json();
+      alert(data.suggestions || "AI suggested no changes.");
+    } catch (error) {
+      console.error("AI error:", error);
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full w-full bg-white dark:bg-zinc-950">
@@ -19,14 +154,51 @@ export default function EducationPage() {
         {/* Left Side: Form */}
         <div className="w-full lg:w-1/2 xl:w-7/12 flex flex-col h-full overflow-y-auto px-8 md:px-12 pt-12 pb-32">
           <div className="max-w-3xl w-full mx-auto space-y-8">
-            <div>
-              <h1 className="text-4xl font-extrabold tracking-tight mb-3 text-slate-900 dark:text-white">
-                Tell us about your education
-              </h1>
-              <p className="text-lg text-slate-600 dark:text-slate-400">
-                Include any education, training, or programs—even if unfinished—to highlight your progress and goals.
-              </p>
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 className="text-4xl font-extrabold tracking-tight mb-3 text-slate-900 dark:text-white">
+                  Tell us about your education
+                </h1>
+                <p className="text-lg text-slate-600 dark:text-slate-400">
+                  Include any education, training, or programs—even if unfinished—to highlight your progress and goals.
+                </p>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={getAiHelp}
+                disabled={aiLoading}
+                className="gap-2 border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100"
+              >
+                <Wand2 className="h-4 w-4" />
+                {aiLoading ? "Thinking..." : "AI Help"}
+              </Button>
             </div>
+
+            {/* List of Added Education */}
+            {resumeData.education.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Your Education</h3>
+                <div className="space-y-3">
+                  {resumeData.education.map((edu: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-xl group shadow-sm hover:shadow-md transition-all">
+                      <div>
+                        <div className="font-bold text-slate-900 dark:text-white">{edu.degree}</div>
+                        <div className="text-sm text-slate-500">{edu.institution} | {edu.gradYear}</div>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleDelete(index)}
+                        className="text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100 transition-all"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="bg-slate-50 dark:bg-zinc-900 p-8 rounded-xl border border-slate-100 dark:border-zinc-800 space-y-8 relative">
               {/* Row 1: Institution & Location */}
@@ -35,6 +207,8 @@ export default function EducationPage() {
                   <Label htmlFor="institution" className="text-slate-600 dark:text-slate-400 font-medium">Institution name</Label>
                   <Input 
                     id="institution" 
+                    value={formData.institution}
+                    onChange={handleChange}
                     className="bg-white dark:bg-black h-12 focus-visible:ring-blue-500 border-blue-500 ring-1 ring-blue-500" 
                   />
                 </div>
@@ -42,6 +216,8 @@ export default function EducationPage() {
                   <Label htmlFor="location" className="text-slate-600 dark:text-slate-400 font-medium">School Location</Label>
                   <Input 
                     id="location" 
+                    value={formData.location}
+                    onChange={handleChange}
                     placeholder="e.g. Nairobi, Kenya" 
                     className="bg-white dark:bg-black h-12" 
                   />
@@ -54,7 +230,8 @@ export default function EducationPage() {
                   <Label htmlFor="degree" className="text-slate-600 dark:text-slate-400 font-medium">Degree</Label>
                   <select 
                     id="degree"
-                    defaultValue="" 
+                    value={formData.degree}
+                    onChange={handleChange}
                     className="w-full h-12 rounded-md border border-input bg-white dark:bg-black px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                   >
                     <option value="" disabled>Select</option>
@@ -74,6 +251,8 @@ export default function EducationPage() {
                   <Label htmlFor="field" className="text-slate-600 dark:text-slate-400 font-medium">Field of Study</Label>
                   <Input 
                     id="field" 
+                    value={formData.field}
+                    onChange={handleChange}
                     placeholder="e.g. B.A. in Sociology and Anthropo" 
                     className="bg-white dark:bg-black h-12" 
                   />
@@ -83,7 +262,9 @@ export default function EducationPage() {
                   <Label className="text-slate-600 dark:text-slate-400 font-medium">Graduation Date</Label>
                   <div className="grid grid-cols-2 gap-4">
                     <select 
-                      defaultValue="" 
+                      id="gradMonth"
+                      value={formData.gradMonth}
+                      onChange={handleChange}
                       className="w-full h-12 rounded-md border border-input bg-white dark:bg-black px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                     >
                       <option value="" disabled>Month</option>
@@ -101,12 +282,14 @@ export default function EducationPage() {
                       <option value="12">December</option>
                     </select>
                     <select 
-                      defaultValue="" 
+                      id="gradYear"
+                      value={formData.gradYear}
+                      onChange={handleChange}
                       className="w-full h-12 rounded-md border border-input bg-white dark:bg-black px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                     >
                       <option value="" disabled>Year</option>
                       {Array.from({ length: 30 }, (_, i) => new Date().getFullYear() + 5 - i).map(year => (
-                        <option key={year} value={year}>{year}</option>
+                        <option key={year} value={year.toString()}>{year}</option>
                       ))}
                     </select>
                   </div>
@@ -143,80 +326,13 @@ export default function EducationPage() {
 
         {/* Right Side: Live Preview Highlighted */}
         <div className="hidden lg:flex w-1/2 xl:w-5/12 bg-slate-100 dark:bg-zinc-900/50 border-l border-slate-200 dark:border-zinc-800 flex-col items-center justify-center p-8 relative">
+          <ResumePreview liveEducation={{ ...formData, isStillEnrolled: stillEnrolled }} />
           
-          <div className="w-full max-w-md aspect-[1/1.414] bg-white shadow-xl rounded-sm border border-slate-200 relative overflow-hidden transition-all hover:scale-[1.02] duration-300">
-            {/* Mock Resume Content */}
-            <div className="p-8 h-full flex flex-col text-slate-800">
-              <div className="text-center mb-6 pb-4">
-                <div className="w-12 h-12 mx-auto border border-slate-300 rounded-full flex items-center justify-center text-lg font-serif mb-2">
-                  FK
-                </div>
-                <h2 className="text-2xl font-serif tracking-widest uppercase font-bold">Fifa Kim</h2>
-                <div className="mt-2 text-[10px] text-slate-500 uppercase tracking-widest">
-                  kim99012@gmail.com | 0799849023 | NAIROBI Kenya
-                </div>
-              </div>
-              
-              <div className="flex-1 text-[8px] leading-tight flex flex-col gap-4">
-                <div>
-                  <h3 className="font-bold border-b border-slate-200 mb-1 pb-1 text-xs">Summary</h3>
-                  <p className="text-slate-400">Customer-focused Retail Sales professional with solid understanding of retail dynamics, marketing and customer service. Offering five years of experience providing quality product recommendations and solutions to meet customer needs and exceed expectations. Demonstrated record of exceeding revenue targets by leveraging communication skills and sales expertise.</p>
-                </div>
-                
-                <div>
-                  <h3 className="font-bold border-b border-slate-200 mb-1 pb-1 text-xs">Skills</h3>
-                  <div className="grid grid-cols-1 text-slate-400 gap-1 opacity-50">
-                    <div>Skill 1</div>
-                    <div>Skill 2</div>
-                    <div>Skill 3</div>
-                    <div>Skill 4</div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-bold border-b border-slate-200 mb-2 pb-1 text-xs">Experience</h3>
-                  <div className="mb-4 text-slate-400 opacity-50 grid grid-cols-[1fr_2fr] gap-4">
-                    <div>
-                      <div className="font-semibold text-slate-600">Retail Sales Associate</div>
-                      <div className="italic">Kilimani, Nairobi, Kenya</div>
-                      <div>02/2017 - Current</div>
-                    </div>
-                    <div className="space-y-1">
-                      <div>• Increased monthly sales by 10% by effectively upselling and cross-selling products to maximize profitability.</div>
-                      <div>• Prevented store losses by leveraging awareness, attention to detail and integrity to identify and investigate concerns.</div>
-                      <div>• Processed payments and maintained accurate drawers to meet financial targets.</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Highlighted Education Section */}
-                <div className="relative mt-2">
-                  {/* Highlight Box */}
-                  <div className="absolute -inset-2 border-2 border-amber-400 bg-amber-50/20 rounded-sm pointer-events-none"></div>
-                  
-                  <div className="relative z-10">
-                    <h3 className="font-bold border-b border-slate-200 mb-2 pb-1 text-xs">Education and Training</h3>
-                    
-                    <div className="mb-4 text-slate-500">
-                      <div className="font-semibold text-slate-700">Kamukunji Secondary School | Nairobi, Kenya</div>
-                      <div className="text-slate-400">KCSE mean grade C</div>
-                      <div className="text-slate-400">06/2013</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Zoom Button */}
-            <button className="absolute bottom-4 right-4 w-12 h-12 bg-amber-200 hover:bg-amber-300 rounded-full shadow-lg flex items-center justify-center text-amber-900 transition-colors z-20">
-              <ZoomIn className="h-5 w-5" />
-            </button>
-          </div>
-
           <button className="mt-8 text-blue-600 dark:text-blue-400 font-bold hover:underline transition-all">
             Change template
           </button>
         </div>
+
       </div>
 
       {/* Bottom Sticky Footer */}
@@ -227,12 +343,25 @@ export default function EducationPage() {
             Back
           </Button>
         </Link>
-        <Link href="/builder/skills-intro">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-10 h-12 rounded-full text-lg shadow-md transition-all hover:shadow-lg">
-            Continue
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="outline"
+            onClick={handleAddAnother}
+            className="border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 font-semibold px-6 h-12 rounded-full hidden md:flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Add Another
           </Button>
-        </Link>
+          <Button 
+            onClick={handleSaveAndContinue}
+            disabled={loading}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-10 h-12 rounded-full text-lg shadow-md transition-all hover:shadow-lg disabled:opacity-50"
+          >
+            {loading ? "Saving..." : (resumeData.education.length > 0 && !formData.institution ? "Continue" : "Save & Continue")}
+          </Button>
+        </div>
       </div>
+
     </div>
   );
 }

@@ -4,12 +4,70 @@ import { ArrowLeft, ZoomIn, Plus, Bold, Italic, Underline, List, Undo, Redo, Wan
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useResume } from "@/lib/context/ResumeContext";
+import { ResumePreview } from "@/components/ResumePreview";
+
 export default function SummaryPage() {
+  const router = useRouter();
+  const { resumeData, updateSection } = useResume();
+  const [summary, setSummary] = useState(resumeData.summary?.content || "");
+  const [loading, setLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+
+
   const prewrittenOptions = [
     "Highly-motivated employee with desire to take on new challenges. Strong work ethic, adaptability, and exceptional interpersonal skills. Adept at working effectively unsupervised and quickly mastering new skills.",
     "Hardworking employee with customer service, multitasking, and time management abilities. Devoted to giving every customer a positive and memorable experience.",
     "Outgoing student pursuing flexible part-time employment. Eager to learn new skills and contribute to team success."
   ];
+
+  const addOption = (text: string) => {
+    setSummary(prev => prev ? `${prev}\n\n${text}` : text);
+  };
+
+  const handleSaveAndContinue = async () => {
+    setLoading(true);
+    try {
+      updateSection("summary", { content: summary });
+      const response = await fetch("/api/resume/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ section: "summary", data: { content: summary } })
+      });
+      
+      if (response.status === 401) {
+        router.push("/sign-in?redirect_url=" + window.location.href);
+        return;
+      }
+
+      if (response.ok) {
+        router.push("/builder/additional-intro");
+      }
+    } catch (error) {
+      console.error("Save error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getAiHelp = async () => {
+    setAiLoading(true);
+    try {
+      const response = await fetch("/api/ai/suggestions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ section: "summary", data: { content: summary } })
+      });
+      const data = await response.json();
+      alert(data.suggestions || "AI suggested no changes.");
+    } catch (error) {
+      console.error("AI error:", error);
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full w-full bg-white dark:bg-zinc-950">
@@ -47,7 +105,10 @@ export default function SummaryPage() {
                           {text}
                         </p>
                         <div className="flex justify-end">
-                          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-100/50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-semibold text-xs hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors">
+                          <button 
+                            onClick={() => addOption(text)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-100/50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-semibold text-xs hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
+                          >
                             <Plus className="h-3 w-3" strokeWidth={3} />
                             Add
                           </button>
@@ -87,14 +148,22 @@ export default function SummaryPage() {
                       </Button>
                     </div>
                     
-                    <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs font-semibold bg-slate-100 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={getAiHelp}
+                      disabled={aiLoading}
+                      className="h-8 gap-1.5 text-xs font-semibold bg-slate-100 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700"
+                    >
                       <Wand2 className="h-3.5 w-3.5" />
-                      Enhance with AI
+                      {aiLoading ? "Thinking..." : "Enhance with AI"}
                     </Button>
                   </div>
                   
                   {/* Editor Content Area */}
                   <textarea 
+                    value={summary}
+                    onChange={(e) => setSummary(e.target.value)}
                     className="flex-1 w-full p-6 resize-none focus:outline-none text-slate-600 dark:text-slate-300 placeholder:text-slate-400 bg-transparent text-base"
                     placeholder="Enter text here"
                   ></textarea>
@@ -107,77 +176,9 @@ export default function SummaryPage() {
 
         {/* Right Side: Live Preview Highlighted */}
         <div className="hidden lg:flex w-1/2 xl:w-5/12 bg-slate-100 dark:bg-zinc-900/50 border-l border-slate-200 dark:border-zinc-800 flex-col items-center justify-center p-8 relative">
+          <ResumePreview />
           
-          <div className="w-full max-w-md aspect-[1/1.414] bg-white shadow-xl rounded-sm border border-slate-200 relative overflow-hidden transition-all hover:scale-[1.02] duration-300">
-            {/* Mock Resume Content */}
-            <div className="p-8 h-full flex flex-col text-slate-800">
-              <div className="text-center mb-6 pb-4">
-                <div className="w-12 h-12 mx-auto border border-slate-300 rounded-full flex items-center justify-center text-lg font-serif mb-2">
-                  FK
-                </div>
-                <h2 className="text-2xl font-serif tracking-widest uppercase font-bold">Fifa Kim</h2>
-                <div className="mt-2 text-[10px] text-slate-500 uppercase tracking-widest">
-                  kim99012@gmail.com | 0799849023 | NAIROBI Kenya
-                </div>
-              </div>
-              
-              <div className="flex-1 text-[8px] leading-tight flex flex-col gap-4">
-                
-                {/* Highlighted Summary Section */}
-                <div className="relative mt-2">
-                  {/* Highlight Box */}
-                  <div className="absolute -inset-2 border-2 border-amber-400 bg-amber-50/20 rounded-sm pointer-events-none z-10"></div>
-                  
-                  <div className="relative z-10">
-                    <h3 className="font-bold border-b border-slate-200 mb-1 pb-1 text-xs">Summary</h3>
-                    <p className="text-slate-400">Customer-focused Retail Sales professional with solid understanding of retail dynamics, marketing and customer service. Offering five years of experience providing quality product recommendations and solutions to meet customer needs and exceed expectations. Demonstrated record of exceeding revenue targets by leveraging communication skills and sales expertise.</p>
-                  </div>
-                </div>
-                
-                <div className="mt-2">
-                  <h3 className="font-bold border-b border-slate-200 mb-1 pb-1 text-xs">Skills</h3>
-                  <div className="grid grid-cols-1 text-slate-400 gap-1 opacity-50 font-medium">
-                    <div>Skill 1</div>
-                    <div>Skill 2</div>
-                    <div>Skill 3</div>
-                    <div>Skill 4</div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-bold border-b border-slate-200 mb-2 pb-1 text-xs">Experience</h3>
-                  <div className="mb-4 text-slate-400 opacity-50 grid grid-cols-[1fr_2fr] gap-4">
-                    <div>
-                      <div className="font-semibold text-slate-600">Retail Sales Associate</div>
-                      <div className="italic">Kilimani, Nairobi, Kenya</div>
-                      <div>02/2017 - Current</div>
-                    </div>
-                    <div className="space-y-1">
-                      <div>• Increased monthly sales by 10% by effectively upselling and cross-selling products to maximize profitability.</div>
-                      <div>• Prevented store losses by leveraging awareness, attention to detail and integrity to identify and investigate concerns.</div>
-                      <div>• Processed payments and maintained accurate drawers to meet financial targets.</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-bold border-b border-slate-200 mb-2 pb-1 text-xs">Education and Training</h3>
-                  <div className="mb-4 text-slate-400 opacity-50">
-                    <div className="font-semibold text-slate-600">Kamukunji Secondary School | Nairobi, Kenya</div>
-                    <div>KCSE mean grade C</div>
-                    <div>06/2013</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Zoom Button */}
-            <button className="absolute bottom-4 right-4 w-12 h-12 bg-amber-200 hover:bg-amber-300 rounded-full shadow-lg flex items-center justify-center text-amber-900 transition-colors z-20">
-              <ZoomIn className="h-5 w-5" />
-            </button>
-          </div>
-
-          <button className="mt-8 text-blue-600 dark:text-blue-400 font-bold hover:underline transition-all z-20">
+          <button className="mt-8 text-blue-600 dark:text-blue-400 font-bold hover:underline transition-all">
             Change template
           </button>
         </div>
@@ -196,11 +197,13 @@ export default function SummaryPage() {
             <Sparkles className="h-4 w-4" />
             Tips & fixes
           </Button>
-          <Link href="/builder/additional-intro">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-10 h-12 rounded-full text-lg shadow-md transition-all hover:shadow-lg">
-              Continue
-            </Button>
-          </Link>
+          <Button 
+            onClick={handleSaveAndContinue}
+            disabled={loading}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-10 h-12 rounded-full text-lg shadow-md transition-all hover:shadow-lg disabled:opacity-50"
+          >
+            {loading ? "Saving..." : "Continue"}
+          </Button>
         </div>
       </div>
     </div>

@@ -6,8 +6,11 @@ import { motion } from "framer-motion";
 import { FileText, Sparkles, Layout, CheckCircle, ArrowRight, PenTool } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 
 export default function Home() {
+  const { user, isLoaded } = useUser();
+
   const fadeIn = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
@@ -39,11 +42,28 @@ export default function Home() {
             <Link href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">Pricing</Link>
           </nav>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" className="hidden sm:inline-flex">Log in</Button>
-            <Button>Get Started</Button>
+            {isLoaded && !user && (
+              <>
+                <SignInButton mode="modal">
+                  <Button variant="ghost">Log in</Button>
+                </SignInButton>
+                <SignInButton mode="modal">
+                  <Button>Get Started</Button>
+                </SignInButton>
+              </>
+            )}
+            {isLoaded && user && (
+              <>
+                <Link href="/builder">
+                  <Button variant="ghost">My Resumes</Button>
+                </Link>
+                <UserButton afterSignOutUrl="/" />
+              </>
+            )}
           </div>
         </div>
       </header>
+
 
       <main className="flex-1">
         {/* Hero Section */}
