@@ -178,9 +178,11 @@ export default function BuilderPage() {
             Back
           </Button>
         </Link>
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-10 h-12 rounded-full text-lg shadow-md transition-all hover:shadow-lg">
-          Continue
-        </Button>
+        <Link href="/builder/experience-intro">
+          <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-10 h-12 rounded-full text-lg shadow-md transition-all hover:shadow-lg">
+            Continue
+          </Button>
+        </Link>
       </div>
     </div>
   );
