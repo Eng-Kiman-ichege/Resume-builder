@@ -196,7 +196,7 @@ export default function SummaryPage() {
             <Sparkles className="h-4 w-4" />
             Tips & fixes
           </Button>
-          <Link href="#">
+          <Link href="/builder/additional-intro">
             <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-10 h-12 rounded-full text-lg shadow-md transition-all hover:shadow-lg">
               Continue
             </Button>
