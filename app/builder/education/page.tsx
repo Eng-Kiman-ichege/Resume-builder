@@ -227,7 +227,7 @@ export default function EducationPage() {
             Back
           </Button>
         </Link>
-        <Link href="#">
+        <Link href="/builder/skills-intro">
           <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-10 h-12 rounded-full text-lg shadow-md transition-all hover:shadow-lg">
             Continue
           </Button>
