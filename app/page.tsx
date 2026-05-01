@@ -70,10 +70,12 @@ export default function Home() {
               </p>
               
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                <Button size="lg" className="w-full sm:w-auto text-base h-12 px-8">
-                  Create My Resume
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                <Link href="/builder">
+                  <Button size="lg" className="w-full sm:w-auto text-base h-12 px-8">
+                    Create My Resume
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
                 <Button size="lg" variant="outline" className="w-full sm:w-auto text-base h-12 px-8">
                   View Templates
                 </Button>
