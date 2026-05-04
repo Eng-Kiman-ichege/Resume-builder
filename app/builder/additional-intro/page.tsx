@@ -22,7 +22,7 @@ export default function AdditionalIntroPage() {
       <div className="flex-1 flex overflow-hidden">
         
         {/* Left Side: Intro Content */}
-        <div className="w-full lg:w-1/2 xl:w-7/12 flex flex-col h-full justify-center px-8 md:px-16 lg:px-24 py-12 relative z-10">
+        <div className="w-full lg:w-1/2 xl:w-7/12 flex flex-col h-full justify-center px-4 sm:px-8 md:px-16 lg:px-24 py-8 sm:py-12 relative z-10">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -33,15 +33,15 @@ export default function AdditionalIntroPage() {
               You got this! Last up <span className="text-slate-400">→</span> Additional Details
             </div>
             
-            <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6 text-slate-900 dark:text-white leading-[1.1]">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 sm:mb-6 text-slate-900 dark:text-white leading-[1.1]">
               Select (optional) <br/> details to add
             </h1>
 
-            <p className="text-slate-700 dark:text-slate-300 text-lg mb-8">
+            <p className="text-slate-700 dark:text-slate-300 text-base sm:text-lg mb-6 sm:mb-8">
               Pick anything you'd like to highlight that's not already on your resume.
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-16">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mb-8 sm:mb-16">
               {options.map((opt, index) => {
                 const Icon = opt.icon;
                 return (
@@ -50,22 +50,22 @@ export default function AdditionalIntroPage() {
                     className="flex items-center gap-4 p-4 rounded-xl border border-slate-300 dark:border-zinc-700 bg-transparent hover:bg-slate-50 dark:hover:bg-zinc-800/50 hover:border-slate-400 dark:hover:border-zinc-500 transition-all text-left"
                   >
                     <Icon className="h-6 w-6 text-slate-800 dark:text-slate-200" strokeWidth={1.5} />
-                    <span className="font-bold text-slate-900 dark:text-white">{opt.label}</span>
+                    <span className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">{opt.label}</span>
                   </button>
                 );
               })}
             </div>
 
-            <div className="flex items-center gap-6 relative">
+            <div className="flex items-center gap-4 sm:gap-6 relative mb-8 sm:mb-0">
               <Link href="/builder/summary">
-                <Button variant="ghost" className="text-blue-600 dark:text-blue-400 font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 px-6 h-14 text-lg">
+                <Button variant="ghost" className="text-blue-600 dark:text-blue-400 font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 px-4 sm:px-6 h-12 sm:h-14 text-base sm:text-lg">
                   <ArrowLeft className="mr-2 h-5 w-5" />
                   Back
                 </Button>
               </Link>
               
               <Link href="/builder/additional">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-12 h-14 rounded-full text-lg shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 sm:px-12 h-12 sm:h-14 rounded-full text-base sm:text-lg shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5">
                   Continue
                 </Button>
               </Link>

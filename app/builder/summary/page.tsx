@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ZoomIn, Plus, Bold, Italic, Underline, List, Undo, Redo, Wand2, Sparkles } from "lucide-react";
+import { ArrowLeft, ZoomIn, Plus, Bold, Italic, Underline, List, Undo, Redo, Wand2, Sparkles, Layout } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useResume } from "@/lib/context/ResumeContext";
 import { ResumePreview } from "@/components/ResumePreview";
+import { TemplateSelector } from "@/components/TemplateSelector";
 
 export default function SummaryPage() {
   const router = useRouter();
@@ -75,19 +76,19 @@ export default function SummaryPage() {
       <div className="flex-1 flex overflow-hidden">
         
         {/* Left Side: Form Area */}
-        <div className="w-full lg:w-1/2 xl:w-7/12 flex flex-col h-full overflow-y-auto px-8 md:px-12 pt-12 pb-32">
+        <div className="w-full lg:w-1/2 xl:w-7/12 flex flex-col h-full overflow-y-auto px-4 sm:px-8 md:px-12 pt-6 sm:pt-12 pb-32">
           <div className="max-w-4xl w-full mx-auto space-y-8">
             <div>
-              <h1 className="text-4xl font-extrabold tracking-tight mb-3 text-slate-900 dark:text-white">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight mb-3 text-slate-900 dark:text-white">
                 Briefly tell us about your background
               </h1>
-              <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl">
+              <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl">
                 Start with a prewritten option or write your own. Edit as needed, then use <span className="font-bold text-slate-800 dark:text-slate-200">Enhance with AI</span> to polish it.
               </p>
             </div>
 
-            <div className="bg-slate-50 dark:bg-zinc-900 p-6 rounded-xl border border-slate-100 dark:border-zinc-800">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[500px]">
+            <div className="bg-slate-50 dark:bg-zinc-900 p-4 sm:p-6 rounded-xl border border-slate-100 dark:border-zinc-800">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:h-[500px]">
                 
                 {/* Left Panel: Prewritten Options */}
                 <div className="bg-white dark:bg-black rounded-xl border border-slate-200 dark:border-zinc-800 overflow-hidden flex flex-col relative shadow-sm">
@@ -124,8 +125,8 @@ export default function SummaryPage() {
                 {/* Right Panel: Text Editor */}
                 <div className="bg-white dark:bg-black rounded-xl border border-slate-200 dark:border-zinc-800 overflow-hidden flex flex-col shadow-sm">
                   {/* Editor Toolbar */}
-                  <div className="flex items-center justify-between p-3 border-b border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50">
-                    <div className="flex items-center gap-1">
+                  <div className="flex flex-wrap lg:flex-nowrap items-center justify-between p-2 sm:p-3 border-b border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 gap-2">
+                    <div className="flex items-center flex-wrap gap-1">
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-800">
                         <Bold className="h-4 w-4" />
                       </Button>
@@ -175,17 +176,25 @@ export default function SummaryPage() {
         </div>
 
         {/* Right Side: Live Preview Highlighted */}
-        <div className="hidden lg:flex w-1/2 xl:w-5/12 bg-slate-100 dark:bg-zinc-900/50 border-l border-slate-200 dark:border-zinc-800 flex-col items-center justify-center p-8 relative">
-          <ResumePreview />
-          
-          <button className="mt-8 text-blue-600 dark:text-blue-400 font-bold hover:underline transition-all">
-            Change template
-          </button>
+        <div className="hidden lg:flex w-1/2 xl:w-5/12 bg-slate-100 dark:bg-zinc-900/50 border-l border-slate-200 dark:border-zinc-800 flex-col relative overflow-hidden">
+          <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center justify-start scrollbar-hide">
+             <ResumePreview />
+             
+             {/* Action Button below template */}
+             <div className="mt-8 pb-12">
+               <TemplateSelector>
+                 <Button variant="outline" className="rounded-full border-blue-200 dark:border-blue-900/50 bg-white dark:bg-zinc-950 text-blue-600 dark:text-blue-400 font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 px-10 h-12 shadow-md transition-all hover:shadow-lg">
+                   <Layout className="h-4 w-4 mr-2" />
+                   Change template
+                 </Button>
+               </TemplateSelector>
+             </div>
+          </div>
         </div>
       </div>
 
       {/* Bottom Sticky Footer */}
-      <div className="fixed bottom-0 right-0 left-0 lg:left-[18rem] bg-white dark:bg-black border-t border-slate-200 dark:border-zinc-800 p-4 md:px-8 flex items-center justify-between z-20">
+      <div className="fixed bottom-0 right-0 left-0 lg:left-[18rem] bg-white dark:bg-black border-t border-slate-200 dark:border-zinc-800 p-3 sm:p-4 md:px-8 flex items-center justify-between z-20">
         <Link href="/builder/summary-intro">
           <Button variant="ghost" className="text-blue-600 dark:text-blue-400 font-semibold hover:bg-blue-50 dark:hover:bg-blue-900/20 px-6 h-12">
             <ArrowLeft className="mr-2 h-4 w-4" />

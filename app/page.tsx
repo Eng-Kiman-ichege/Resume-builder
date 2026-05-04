@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { FileText, Sparkles, Layout, CheckCircle, ArrowRight, PenTool } from "lucide-react";
@@ -10,6 +12,18 @@ import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 
 export default function Home() {
   const { user, isLoaded } = useUser();
+  const router = useRouter();
+
+  // Redirect to dashboard if logged in
+  useEffect(() => {
+    if (isLoaded && user) {
+      router.push("/dashboard");
+    }
+  }, [isLoaded, user, router]);
+
+  if (isLoaded && user) {
+    return null;
+  }
 
   const fadeIn = {
     initial: { opacity: 0, y: 20 },
@@ -57,7 +71,7 @@ export default function Home() {
                 <Link href="/builder">
                   <Button variant="ghost">My Resumes</Button>
                 </Link>
-                <UserButton afterSignOutUrl="/" />
+                <UserButton />
               </>
             )}
           </div>

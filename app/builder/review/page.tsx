@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { templates, colors } from "@/lib/templates";
+import { TEMPLATES as templates, colors } from "@/lib/templates";
 import { cn } from "@/lib/utils";
 
 export default function ReviewPage() {
@@ -31,14 +31,13 @@ export default function ReviewPage() {
       const res = await fetch("/api/templates");
       if (res.ok) {
         const data = await res.json();
-        // Fallback to initial templates if DB is empty for now
-        setDbTemplates(data.length > 0 ? data : templates);
+        setDbTemplates(data);
       } else {
-        setDbTemplates(templates);
+        setDbTemplates([]);
       }
     } catch (err) {
       console.error(err);
-      setDbTemplates(templates);
+      setDbTemplates([]);
     } finally {
       setLoadingTemplates(false);
     }
@@ -268,16 +267,14 @@ export default function ReviewPage() {
         </div>
 
         {/* Center: Resume Preview */}
-        <div className="flex-1 overflow-y-auto bg-slate-200/20 p-12 flex flex-col items-center custom-scrollbar">
+        <div className="flex-1 overflow-y-auto bg-slate-200/20 p-8 flex flex-col items-center custom-scrollbar">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="shadow-[0_20px_50px_rgba(0,0,0,0.3)] bg-white transform scale-[1.1] origin-top"
+            className="shadow-[0_20px_50px_rgba(0,0,0,0.3)] bg-white origin-top"
+            onClick={() => setActiveTab("design")}
           >
-            <ResumePreview onPartClick={(part) => {
-              setEditingPart(part);
-              setActiveTab("design");
-            }} />
+            <ResumePreview />
           </motion.div>
         </div>
 

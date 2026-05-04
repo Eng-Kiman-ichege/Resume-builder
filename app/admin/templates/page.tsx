@@ -5,7 +5,7 @@ import { Plus, Trash2, Save, Layout, CheckCircle2, FileText, Upload, X, File, Lo
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { templates as initialTemplates } from "@/lib/templates";
+import { TEMPLATES as initialTemplates } from "@/lib/templates";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function AdminTemplatesPage() {
@@ -113,12 +113,19 @@ export default function AdminTemplatesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure? This will remove it from the database.")) return;
+    if (!confirm("Are you sure? This will permanently delete this template.")) return;
     
-    // In a real app, you'd have a DELETE /api/templates/[id]
-    // For now, we'll just filter it out. 
-    // If we wanted to persist the deletion, we'd need a delete endpoint.
-    setTemplates(templates.filter(t => t.id !== id));
+    try {
+      const res = await fetch(`/api/templates/${id}`, {
+        method: "DELETE"
+      });
+      
+      if (res.ok) {
+        setTemplates(prev => prev.filter(t => t.id !== id));
+      }
+    } catch (err) {
+      console.error("Delete failed:", err);
+    }
   };
 
   return (
@@ -129,8 +136,27 @@ export default function AdminTemplatesPage() {
             <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white mb-2 tracking-tight">Template Vault</h1>
             <p className="text-slate-600 dark:text-slate-400">Upload and manage professional PDF resume templates.</p>
           </div>
-          <div className="bg-red-600/10 text-red-600 px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 border border-red-600/20">
-            <FileText className="h-4 w-4" /> {templates.length} PDF Templates
+          <div className="flex gap-4 items-center">
+            <Button 
+              variant="outline" 
+              className="text-red-600 border-red-200 hover:bg-red-50 font-bold rounded-full px-6"
+              onClick={async () => {
+                if (confirm("Are you sure? This will delete EVERY template from the database.")) {
+                  setSaving(true);
+                  try {
+                    await Promise.all(templates.map(t => fetch(`/api/templates/${t.id}`, { method: "DELETE" })));
+                    setTemplates([]);
+                  } finally {
+                    setSaving(false);
+                  }
+                }
+              }}
+            >
+              Clear All Templates
+            </Button>
+            <div className="bg-red-600/10 text-red-600 px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 border border-red-600/20">
+              <FileText className="h-4 w-4" /> {templates.length} PDF Templates
+            </div>
           </div>
         </header>
 

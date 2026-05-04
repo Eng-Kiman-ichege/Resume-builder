@@ -13,7 +13,7 @@ export default function SkillsIntroPage() {
       <div className="flex-1 flex overflow-hidden">
         
         {/* Left Side: Intro Content */}
-        <div className="w-full lg:w-1/2 xl:w-7/12 flex flex-col h-full justify-center px-8 md:px-16 lg:px-24 py-12 relative z-10">
+        <div className="w-full lg:w-1/2 xl:w-7/12 flex flex-col h-full justify-center px-4 sm:px-8 md:px-16 lg:px-24 py-8 sm:py-12 relative z-10">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -24,11 +24,11 @@ export default function SkillsIntroPage() {
               Great progress! Next up <span className="text-slate-400">→</span> Skills
             </div>
             
-            <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-12 text-slate-900 dark:text-white leading-[1.1]">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-8 sm:mb-12 text-slate-900 dark:text-white leading-[1.1]">
               Time to showcase <br/> your <span className="relative inline-block">skills<div className="absolute -bottom-2 left-0 w-full h-1.5 bg-green-300 dark:bg-green-600 rounded-full"></div></span>
             </h1>
 
-            <div className="flex gap-4 items-start bg-transparent mb-16">
+            <div className="flex gap-4 items-start bg-transparent mb-8 sm:mb-16">
               <div className="mt-1 text-amber-500 dark:text-amber-400">
                 <Wand2 className="h-6 w-6 stroke-2" />
               </div>
@@ -39,16 +39,16 @@ export default function SkillsIntroPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-6 relative mb-16">
+            <div className="flex items-center gap-4 sm:gap-6 relative mb-8 sm:mb-16">
               <Link href="/builder/education">
-                <Button variant="ghost" className="text-blue-600 dark:text-blue-400 font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 px-6 h-14 text-lg">
+                <Button variant="ghost" className="text-blue-600 dark:text-blue-400 font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 px-4 sm:px-6 h-12 sm:h-14 text-base sm:text-lg">
                   <ArrowLeft className="mr-2 h-5 w-5" />
                   Back
                 </Button>
               </Link>
               
               <Link href="/builder/skills">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-12 h-14 rounded-full text-lg shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 sm:px-12 h-12 sm:h-14 rounded-full text-base sm:text-lg shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5">
                   Continue
                 </Button>
               </Link>

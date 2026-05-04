@@ -1,10 +1,11 @@
 "use client";
 
-import { ArrowLeft, ZoomIn, Plus } from "lucide-react";
+import { ArrowLeft, ZoomIn, Plus, Layout } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useResume } from "@/lib/context/ResumeContext";
 import { ResumePreview } from "@/components/ResumePreview";
+import { TemplateSelector } from "@/components/TemplateSelector";
 import { useRouter } from "next/navigation";
 
 export default function AdditionalDetailsPage() {
@@ -17,16 +18,15 @@ export default function AdditionalDetailsPage() {
       <div className="flex-1 flex overflow-hidden">
         
         {/* Left Side: Form Area */}
-        <div className="w-full lg:w-1/2 xl:w-7/12 flex flex-col h-full overflow-y-auto px-8 md:px-12 pt-12 pb-32">
+        <div className="w-full lg:w-1/2 xl:w-7/12 flex flex-col h-full overflow-y-auto px-4 sm:px-8 md:px-12 pt-6 sm:pt-12 pb-32">
           <div className="max-w-4xl w-full mx-auto space-y-8">
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-              <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-lg leading-tight">
-                Add details that show you're a well-rounded candidate
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight mb-3 text-slate-900 dark:text-white">
+                Do you have anything else to add?
               </h1>
-              <Button className="bg-amber-300 hover:bg-amber-400 text-amber-950 font-bold px-6 h-12 rounded-full shadow-sm transition-all shrink-0">
-                <Plus className="mr-2 h-4 w-4" strokeWidth={3} />
-                Add section
-              </Button>
+              <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl">
+                Add details that show you're a well-rounded candidate
+              </p>
             </div>
 
             <div className="bg-slate-50 dark:bg-zinc-900 p-8 rounded-xl border border-slate-100 dark:border-zinc-800 flex items-center justify-center min-h-[200px]">
@@ -41,17 +41,25 @@ export default function AdditionalDetailsPage() {
         </div>
 
         {/* Right Side: Live Preview Highlighted */}
-        <div className="hidden lg:flex w-1/2 xl:w-5/12 bg-slate-100 dark:bg-zinc-900/50 border-l border-slate-200 dark:border-zinc-800 flex-col items-center justify-center p-8 relative">
-          <ResumePreview />
-          
-          <button className="mt-8 text-blue-600 dark:text-blue-400 font-bold hover:underline transition-all">
-            Change template
-          </button>
+        <div className="hidden lg:flex w-1/2 xl:w-5/12 bg-slate-100 dark:bg-zinc-900/50 border-l border-slate-200 dark:border-zinc-800 flex-col relative overflow-hidden">
+          <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center justify-start scrollbar-hide">
+             <ResumePreview />
+             
+             {/* Action Button below template */}
+             <div className="mt-8 pb-12">
+               <TemplateSelector>
+                 <Button variant="outline" className="rounded-full border-blue-200 dark:border-blue-900/50 bg-white dark:bg-zinc-950 text-blue-600 dark:text-blue-400 font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 px-10 h-12 shadow-md transition-all hover:shadow-lg">
+                   <Layout className="h-4 w-4 mr-2" />
+                   Change template
+                 </Button>
+               </TemplateSelector>
+             </div>
+          </div>
         </div>
       </div>
 
       {/* Bottom Sticky Footer */}
-      <div className="fixed bottom-0 right-0 left-0 lg:left-[18rem] bg-white dark:bg-black border-t border-slate-200 dark:border-zinc-800 p-4 md:px-8 flex items-center justify-between z-20">
+      <div className="fixed bottom-0 right-0 left-0 lg:left-[18rem] bg-white dark:bg-black border-t border-slate-200 dark:border-zinc-800 p-3 sm:p-4 md:px-8 flex items-center justify-between z-20">
         <Link href="/builder/summary">
           <Button variant="ghost" className="text-blue-600 dark:text-blue-400 font-semibold hover:bg-blue-50 dark:hover:bg-blue-900/20 px-6 h-12">
             <ArrowLeft className="mr-2 h-4 w-4" />
