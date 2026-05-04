@@ -44,8 +44,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Sidebar */}
       <aside 
         className={`
-          fixed lg:relative inset-y-0 left-0 z-50
-          w-64 lg:w-72 bg-[#1a2332] flex flex-col py-8 border-r border-slate-800 text-white relative overflow-hidden
+          ${isOpen ? 'flex' : 'hidden'} lg:flex fixed lg:relative inset-y-0 left-0 z-50
+          w-64 lg:w-72 bg-[#1a2332] flex-col py-8 border-r border-slate-800 text-white relative overflow-hidden
           transform transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
           lg:flex-shrink-0

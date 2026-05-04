@@ -14,7 +14,7 @@ export default function BuilderLayout({
 
   return (
     <ResumeProvider>
-      <div className="flex h-screen w-full bg-slate-50 dark:bg-zinc-950 overflow-hidden">
+      <div className="flex h-screen w-full bg-slate-50 dark:bg-zinc-950 overflow-hidden flex-col lg:flex-row">
         {/* Mobile Header with Hamburger */}
         <div className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-[#1a2332] flex items-center px-4 z-30 border-b border-slate-800">
           <button
@@ -30,7 +30,7 @@ export default function BuilderLayout({
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         
         {/* Main Content */}
-        <main className="flex-1 flex flex-col h-full overflow-hidden relative pt-14 lg:pt-0">
+        <main className="flex-1 flex flex-col h-full min-h-0 overflow-hidden relative pt-14 lg:pt-0">
           {children}
         </main>
       </div>

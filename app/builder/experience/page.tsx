@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, ZoomIn, Layout } from "lucide-react";
+import { ArrowLeft, ZoomIn, Layout, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +21,7 @@ export default function ExperiencePage() {
   const [currentlyWorkHere, setCurrentlyWorkHere] = useState(false);
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
   const [formData, setFormData] = useState({
     jobTitle: "",
     employer: "",
@@ -157,58 +158,76 @@ export default function ExperiencePage() {
   return (
     <div className="flex flex-col h-full w-full bg-white dark:bg-zinc-950">
       {/* Top Main Content Area */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         
         {/* Left Side: Form */}
-        <div className="w-full lg:w-1/2 xl:w-7/12 flex flex-col h-full overflow-y-auto px-4 sm:px-8 md:px-12 pt-6 sm:pt-12 pb-32">
-          <div className="max-w-3xl w-full mx-auto space-y-8">
-            <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-              <div>
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight mb-3 text-slate-900 dark:text-white">
+        <div className={`w-full lg:w-1/2 xl:w-7/12 flex flex-col h-full overflow-hidden ${showMobilePreview ? 'hidden lg:flex' : 'flex'}`}>
+          {/* Mobile Preview Toggle */}
+          <div className="lg:hidden flex items-center justify-between gap-2 border-b border-slate-200 dark:border-zinc-800 px-3 sm:px-4 py-2 sm:py-3 bg-white dark:bg-zinc-950 flex-shrink-0">
+            <span className="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400">Form</span>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowMobilePreview(!showMobilePreview)}
+              className="gap-2 text-xs sm:text-sm h-8 px-2"
+            >
+              <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
+              Preview
+            </Button>
+          </div>
+
+          {/* Form Content */}
+          <div className="flex-1 overflow-y-auto px-3 sm:px-6 md:px-10 pt-4 sm:pt-6 pb-32 lg:pb-24">
+            <div className="max-w-3xl w-full mx-auto space-y-6 sm:space-y-8">
+              <div className="flex flex-col gap-3 sm:gap-4">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                   Let&apos;s work on your experience
                 </h1>
-                <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400">
+                <p className="text-sm sm:text-base md:text-lg text-slate-600 dark:text-slate-400">
                   Start with your most recent job first and work backwards.
                 </p>
               </div>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={getAiHelp}
-                disabled={aiLoading}
-                className="gap-2 border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 shrink-0"
-              >
-                <Wand2 className="h-4 w-4" />
-                {aiLoading ? "Thinking..." : "AI Help"}
-              </Button>
-            </div>
 
-            {/* List of Added Experiences */}
-            {resumeData.experience.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Your Experience</h3>
-                <div className="space-y-3">
-                  {resumeData.experience.map((exp: any, index: number) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-xl group shadow-sm hover:shadow-md transition-all">
-                      <div>
-                        <div className="font-bold text-slate-900 dark:text-white">{exp.jobTitle}</div>
-                        <div className="text-sm text-slate-500">{exp.employer} | {exp.startYear} - {exp.isCurrent ? "Present" : exp.endYear}</div>
-                      </div>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => handleDelete(index)}
-                        className="text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
+              {/* AI Help button for mobile */}
+              <div className="lg:hidden pt-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={getAiHelp}
+                  disabled={aiLoading}
+                  className="w-full gap-2 border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 text-sm"
+                >
+                  <Wand2 className="h-4 w-4" />
+                  {aiLoading ? "Thinking..." : "Get AI Help"}
+                </Button>
               </div>
-            )}
 
-            <div className="bg-slate-50 dark:bg-zinc-900 p-4 sm:p-6 md:p-8 rounded-xl border border-slate-100 dark:border-zinc-800 space-y-8">
+              {/* List of Added Experiences */}
+              {resumeData.experience.length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Your Experience</h3>
+                  <div className="space-y-3">
+                    {resumeData.experience.map((exp: any, index: number) => (
+                      <div key={index} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-xl group shadow-sm hover:shadow-md transition-all">
+                        <div>
+                          <div className="font-bold text-slate-900 dark:text-white">{exp.jobTitle}</div>
+                          <div className="text-sm text-slate-500">{exp.employer} | {exp.startYear} - {exp.isCurrent ? "Present" : exp.endYear}</div>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => handleDelete(index)}
+                          className="text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="bg-slate-50 dark:bg-zinc-900 p-4 sm:p-6 md:p-8 rounded-xl border border-slate-100 dark:border-zinc-800 space-y-8">
               {/* Row 1: Job Title & Employer */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
@@ -326,21 +345,51 @@ export default function ExperiencePage() {
             </div>
           </div>
         </div>
+        </div>
 
         {/* Right Side: Live Preview Highlighted */}
-        <div className="hidden lg:flex w-1/2 xl:w-5/12 bg-slate-100 dark:bg-zinc-900/50 border-l border-slate-200 dark:border-zinc-800 flex-col relative overflow-hidden">
-          <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center justify-start scrollbar-hide">
+        <div className={`w-full lg:w-1/2 xl:w-5/12 bg-slate-100 dark:bg-zinc-900/50 border-l border-slate-200 dark:border-zinc-800 flex flex-col relative overflow-hidden ${showMobilePreview ? 'flex' : 'hidden lg:flex'}`}>
+          
+          {/* Mobile Preview Header */}
+          <div className="lg:hidden flex items-center justify-between gap-2 border-b border-slate-200 dark:border-zinc-800 px-3 sm:px-4 py-2 sm:py-3 bg-white dark:bg-zinc-900 flex-shrink-0">
+            <span className="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400">Resume Preview</span>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowMobilePreview(false)}
+              className="gap-2 text-xs sm:text-sm h-8 px-2"
+            >
+              <EyeOff className="h-3 w-3 sm:h-4 sm:w-4" />
+              Back
+            </Button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 flex flex-col items-center justify-start scrollbar-hide">
              <ResumePreview liveExperience={{ ...formData, isCurrent: currentlyWorkHere }} />
              
              {/* Action Button below template */}
-             <div className="mt-8 pb-12">
+             <div className="mt-6 sm:mt-8 pb-12">
                <TemplateSelector>
-                 <Button variant="outline" className="rounded-full border-blue-200 dark:border-blue-900/50 bg-white dark:bg-zinc-950 text-blue-600 dark:text-blue-400 font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 px-10 h-12 shadow-md transition-all hover:shadow-lg">
+                 <Button variant="outline" className="rounded-full border-blue-200 dark:border-blue-900/50 bg-white dark:bg-zinc-950 text-blue-600 dark:text-blue-400 font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 px-6 sm:px-8 md:px-10 h-10 sm:h-12 text-sm sm:text-base shadow-md transition-all hover:shadow-lg">
                    <Layout className="h-4 w-4 mr-2" />
                    Change template
                  </Button>
                </TemplateSelector>
              </div>
+          </div>
+
+          {/* AI Help button for desktop */}
+          <div className="hidden lg:block border-t border-slate-200 dark:border-zinc-800 p-4 bg-white dark:bg-zinc-950">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={getAiHelp}
+              disabled={aiLoading}
+              className="w-full gap-2 border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100"
+            >
+              <Wand2 className="h-4 w-4" />
+              {aiLoading ? "Thinking..." : "Get AI Help"}
+            </Button>
           </div>
         </div>
 

@@ -28,7 +28,7 @@ export default function DashboardLayout({
   return (
     <div className="flex flex-col md:flex-row h-screen bg-white">
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-24 border-r border-slate-200 flex-col items-center py-8 gap-10">
+      <aside className="hidden md:flex w-24 border-r border-slate-200 flex-col items-center py-8 gap-10 bg-slate-50">
         <div className="flex flex-col items-center gap-8 w-full">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
@@ -36,12 +36,12 @@ export default function DashboardLayout({
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex flex-col items-center gap-1 group w-full transition-colors ${
-                  isActive ? "text-blue-600" : "text-slate-500 hover:text-slate-800"
+                className={`flex flex-col items-center gap-1 group w-full transition-colors px-2 py-2 rounded-lg ${
+                  isActive ? "text-blue-600 bg-blue-50" : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"
                 }`}
               >
                 <item.icon className="h-6 w-6" />
-                <span className="text-[10px] font-medium uppercase tracking-tight">
+                <span className="text-[10px] font-medium uppercase tracking-tight text-center">
                   {item.name}
                 </span>
               </Link>
@@ -51,12 +51,12 @@ export default function DashboardLayout({
 
         <Link
           href="/dashboard"
-          className="mt-4 flex flex-col items-center gap-1 group w-full"
+          className="mt-4 flex flex-col items-center gap-1 group w-full transition-colors px-2 py-2 rounded-lg"
         >
           <div className="bg-green-300 hover:bg-green-400 transition-colors p-3 rounded-lg text-green-900 shadow-sm">
             <Plus className="h-6 w-6" />
           </div>
-          <span className="text-[10px] font-bold uppercase tracking-tight text-slate-800">
+          <span className="text-[10px] font-bold uppercase tracking-tight text-slate-800 text-center">
             Create new
           </span>
         </Link>
@@ -72,34 +72,33 @@ export default function DashboardLayout({
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-30 flex items-center justify-around px-4 py-2 safe-bottom">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-30 flex items-center justify-around px-1 py-1 safe-bottom shadow-lg">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
               key={item.name}
               href={item.href}
-              className={`flex flex-col items-center gap-0.5 py-1 px-3 transition-colors ${
-                isActive ? "text-blue-600" : "text-slate-400"
+              className={`flex flex-col items-center gap-0.5 py-2 px-2 transition-colors rounded-lg flex-1 ${
+                isActive ? "text-blue-600 bg-blue-50" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
               }`}
             >
               <item.icon className="h-5 w-5" />
-              <span className="text-[10px] font-semibold">{item.name}</span>
+              <span className="text-[9px] font-semibold">{item.name}</span>
             </Link>
           );
         })}
         <Link
           href="/dashboard"
-          className="flex flex-col items-center gap-0.5 py-1 px-3"
+          className="flex flex-col items-center gap-0.5 py-2 px-2 rounded-lg flex-1 hover:bg-slate-50 transition-colors"
         >
           <div className="bg-green-300 p-2 rounded-lg text-green-900">
             <Plus className="h-5 w-5" />
           </div>
-          <span className="text-[10px] font-semibold text-slate-600">New</span>
+          <span className="text-[9px] font-semibold text-slate-600">New</span>
         </Link>
-        <div className="flex flex-col items-center gap-0.5 py-1 px-3">
+        <div className="flex flex-col items-center gap-0.5 py-2 px-2 rounded-lg flex-1">
           <UserButton />
-          <span className="text-[10px] font-semibold text-slate-400">Account</span>
         </div>
       </nav>
     </div>
