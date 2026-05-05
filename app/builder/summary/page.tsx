@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useResume } from "@/lib/context/ResumeContext";
 import { ResumePreview } from "@/components/ResumePreview";
 import { TemplateSelector } from "@/components/TemplateSelector";
+import { AiSuggestionDialog } from "@/components/AiSuggestionDialog";
 
 export default function SummaryPage() {
   const router = useRouter();
@@ -53,16 +54,21 @@ export default function SummaryPage() {
     }
   };
 
+  const [aiSuggestion, setAiSuggestion] = useState<string>("");
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+
   const getAiHelp = async () => {
     setAiLoading(true);
     try {
       const response = await fetch("/api/ai/suggestions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ section: "summary", data: { content: summary } })
+        // Pass full resume data so AI can give better tips based on whole resume
+        body: JSON.stringify({ section: "summary", data: resumeData })
       });
       const data = await response.json();
-      alert(data.suggestions || "AI suggested no changes.");
+      setAiSuggestion(data.suggestions || "AI suggested no changes.");
+      setIsAiModalOpen(true);
     } catch (error) {
       console.error("AI error:", error);
     } finally {
@@ -164,7 +170,10 @@ export default function SummaryPage() {
                   {/* Editor Content Area */}
                   <textarea 
                     value={summary}
-                    onChange={(e) => setSummary(e.target.value)}
+                    onChange={(e) => {
+                      setSummary(e.target.value);
+                      updateSection("summary", { content: e.target.value });
+                    }}
                     className="flex-1 w-full p-6 resize-none focus:outline-none text-slate-600 dark:text-slate-300 placeholder:text-slate-400 bg-transparent text-base"
                     placeholder="Enter text here"
                   ></textarea>
@@ -202,9 +211,14 @@ export default function SummaryPage() {
           </Button>
         </Link>
         <div className="flex items-center gap-4">
-          <Button variant="outline" className="hidden sm:flex items-center gap-2 font-semibold border-slate-300 dark:border-zinc-700 h-12 px-6 rounded-full">
+          <Button 
+            variant="outline" 
+            onClick={getAiHelp}
+            disabled={aiLoading}
+            className="hidden sm:flex items-center gap-2 font-semibold border-slate-300 dark:border-zinc-700 h-12 px-6 rounded-full"
+          >
             <Sparkles className="h-4 w-4" />
-            Tips & fixes
+            {aiLoading ? "Thinking..." : "Tips & fixes"}
           </Button>
           <Button 
             onClick={handleSaveAndContinue}
@@ -215,6 +229,16 @@ export default function SummaryPage() {
           </Button>
         </div>
       </div>
+
+      <AiSuggestionDialog
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        suggestion={aiSuggestion}
+        onApply={(suggestion) => {
+          setSummary(suggestion);
+          updateSection("summary", { content: suggestion });
+        }}
+      />
     </div>
   );
 }

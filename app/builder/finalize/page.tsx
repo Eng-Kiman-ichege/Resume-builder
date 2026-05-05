@@ -94,7 +94,7 @@ export default function FinalizePage() {
               {aiAnalysis ? (
                 <div className="space-y-4">
                   <div className="text-sm text-indigo-900 dark:text-indigo-200 leading-relaxed italic">
-                    "{aiAnalysis}"
+                    &quot;{aiAnalysis}&quot;
                   </div>
                   <Button 
                     variant="outline" 
@@ -195,7 +195,7 @@ export default function FinalizePage() {
                   Elevate your resume. Review our final tips & fixes.
                 </p>
 
-                <Link href="/editor" className="w-full">
+                <Link href="/builder/review" className="w-full">
                   <Button 
                     className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-12 h-14 rounded-full text-lg shadow-lg hover:shadow-xl transition-all w-full max-w-xs mx-auto"
                   >

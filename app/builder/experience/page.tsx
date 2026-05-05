@@ -14,6 +14,7 @@ import { Wand2, Trash2, Plus } from "lucide-react";
 import { useResume } from "@/lib/context/ResumeContext";
 import { ResumePreview } from "@/components/ResumePreview";
 import { TemplateSelector } from "@/components/TemplateSelector";
+import { AiSuggestionDialog } from "@/components/AiSuggestionDialog";
 
 export default function ExperiencePage() {
   const router = useRouter();
@@ -138,6 +139,9 @@ export default function ExperiencePage() {
 
 
 
+  const [aiSuggestion, setAiSuggestion] = useState<string>("");
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+
   const getAiHelp = async () => {
     setAiLoading(true);
     try {
@@ -147,13 +151,16 @@ export default function ExperiencePage() {
         body: JSON.stringify({ section: "experience", data: formData })
       });
       const data = await response.json();
-      alert(data.suggestions || "AI suggested no changes.");
+      setAiSuggestion(data.suggestions || "AI suggested no changes.");
+      setIsAiModalOpen(true);
     } catch (error) {
       console.error("AI error:", error);
     } finally {
       setAiLoading(false);
     }
   };
+
+  const isFormActive = Object.values(formData).some(val => val !== "");
 
   return (
     <div className="flex flex-col h-full w-full bg-white dark:bg-zinc-950">
@@ -365,7 +372,7 @@ export default function ExperiencePage() {
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 flex flex-col items-center justify-start scrollbar-hide">
-             <ResumePreview liveExperience={{ ...formData, isCurrent: currentlyWorkHere }} />
+             <ResumePreview liveExperience={isFormActive ? { ...formData, isCurrent: currentlyWorkHere } : undefined} />
              
              {/* Action Button below template */}
              <div className="mt-6 sm:mt-8 pb-12">
@@ -423,6 +430,12 @@ export default function ExperiencePage() {
         </div>
       </div>
 
+
+      <AiSuggestionDialog
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        suggestion={aiSuggestion}
+      />
     </div>
   );
 }

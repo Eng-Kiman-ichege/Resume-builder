@@ -5,13 +5,15 @@ import { useResume } from "@/lib/context/ResumeContext";
 import { Sparkles, Loader2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getTemplateComponent } from "@/lib/templates";
-import html2canvas from "html2canvas";
+import { toPng } from "html-to-image";
 import jsPDF from "jspdf";
 
 const A4_W = 794;  // A4 width in px at 96 dpi
 const A4_H = 1123; // A4 height in px at 96 dpi
 
-export function ResumePreview({
+import { forwardRef, useImperativeHandle } from "react";
+
+export const ResumePreview = forwardRef(({
   liveExperience,
   liveEducation,
   customTemplateId,
@@ -19,7 +21,7 @@ export function ResumePreview({
   liveExperience?: any;
   liveEducation?: any;
   customTemplateId?: string;
-}) {
+}, ref) => {
   const { resumeData } = useResume();
   const settings = resumeData.settings || { templateId: "modern-classic" };
   const activeTemplateId = (
@@ -47,28 +49,72 @@ export function ResumePreview({
     return () => ro.disconnect();
   }, []);
 
-  const handleDownload = async () => {
+  const handleDownload = async (action: "download" | "print" | "email" = "download") => {
     if (!resumeRef.current) return;
     setExporting(true);
     try {
-      const canvas = await html2canvas(resumeRef.current, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
+      const originalTransform = resumeRef.current.style.transform;
+      resumeRef.current.style.transform = "none";
+      
+      // Wait for DOM to register transform reset (optional, but safer)
+      await new Promise(resolve => setTimeout(resolve, 0));
+      
+      const dataUrl = await toPng(resumeRef.current, {
+        pixelRatio: 2,
         backgroundColor: "#ffffff",
+        style: {
+          transform: "none",
+        }
       });
-      const imgData = canvas.toDataURL("image/png");
+      
+      const elementHeight = resumeRef.current.offsetHeight;
+      const elementWidth = resumeRef.current.offsetWidth;
+      
+      resumeRef.current.style.transform = originalTransform;
+      
       const pdf = new jsPDF("p", "mm", "a4");
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`resume-${resumeData.header.firstName || "cv"}.pdf`);
+      const pdfHeight = (elementHeight * pdfWidth) / elementWidth;
+      
+      pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
+      
+      if (action === "print") {
+        pdf.autoPrint();
+        const blobUrl = pdf.output("bloburl");
+        window.open(blobUrl, "_blank");
+      } else if (action === "email") {
+        const blob = pdf.output("blob");
+        const file = new File([blob], `resume-${resumeData.header?.firstName || "cv"}.pdf`, { type: "application/pdf" });
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              title: "My Resume",
+              files: [file],
+            });
+          } catch (e) {
+            console.error("Share failed", e);
+            pdf.save(`resume-${resumeData.header?.firstName || "cv"}.pdf`);
+            window.location.href = "mailto:?subject=My Resume";
+          }
+        } else {
+          pdf.save(`resume-${resumeData.header?.firstName || "cv"}.pdf`);
+          window.location.href = "mailto:?subject=My Resume&body=I have attached my resume to this email.";
+        }
+      } else {
+        pdf.save(`resume-${resumeData.header?.firstName || "cv"}.pdf`);
+      }
     } catch (err) {
       console.error("Export error:", err);
     } finally {
       setExporting(false);
     }
   };
+
+  useImperativeHandle(ref, () => ({
+    download: () => handleDownload("download"),
+    print: () => handleDownload("print"),
+    email: () => handleDownload("email"),
+  }));
 
   const TemplateComponent = getTemplateComponent(activeTemplateId);
 
@@ -142,4 +188,4 @@ export function ResumePreview({
       </p>
     </div>
   );
-}
+});

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useResume } from "@/lib/context/ResumeContext";
 import { ResumePreview } from "@/components/ResumePreview";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,8 @@ export default function ReviewPage() {
   const [editingPart, setEditingPart] = useState<"accent" | "title" | "layout">("accent");
   const [dbTemplates, setDbTemplates] = useState<any[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
+  
+  const resumeRef = useRef<any>(null);
 
   useEffect(() => {
     fetchTemplates();
@@ -131,80 +133,7 @@ export default function ReviewPage() {
           <div className="flex-1 overflow-y-auto p-6 space-y-8 scrollbar-thin scrollbar-thumb-white/10">
             {activeTab === "design" ? (
               <>
-                <section>
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold capitalize">{editingPart} Color</h3>
-                    <div className="flex gap-1">
-                      {["accent", "title", "layout"].map((part) => (
-                        <button
-                          key={part}
-                          onClick={() => setEditingPart(part as any)}
-                          className={cn(
-                            "px-2 py-1 text-[10px] font-bold uppercase rounded border transition-all",
-                            editingPart === part ? "bg-blue-600 border-blue-600 text-white" : "border-white/10 text-slate-400 hover:text-white"
-                          )}
-                        >
-                          {part}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-4">
-                    <div className="grid grid-cols-4 gap-3">
-                      {colors.map((color) => {
-                        const fieldMap = {
-                          accent: "color",
-                          title: "titleColor",
-                          layout: "backgroundColor"
-                        };
-                        const field = fieldMap[editingPart] as keyof typeof resumeData.settings;
-                        const isActive = resumeData.settings?.[field] === color;
 
-                        return (
-                          <button
-                            key={color}
-                            onClick={() => handleColorChange(color)}
-                            className={cn(
-                              "w-10 h-10 rounded-full border-2 transition-all flex items-center justify-center relative group",
-                              isActive ? "border-white scale-110 shadow-lg" : "border-transparent hover:scale-105"
-                            )}
-                            style={{ backgroundColor: color }}
-                          >
-                            {isActive && (
-                              <div className="bg-white rounded-full p-0.5">
-                                <CheckCircle2 className="h-3 w-3 text-slate-900" />
-                              </div>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                    
-                    {/* Custom Color Picker */}
-                    <div className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10">
-                      <div className="relative w-10 h-10 shrink-0">
-                        <input 
-                          type="color" 
-                          value={resumeData.settings?.[editingPart === "accent" ? "color" : (editingPart === "title" ? "titleColor" : "backgroundColor")] || "#3b82f6"}
-                          onChange={(e) => handleColorChange(e.target.value)}
-                          className="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10"
-                        />
-                        <div 
-                          className="w-full h-full rounded-lg border border-white/20 shadow-inner"
-                          style={{ backgroundColor: resumeData.settings?.[editingPart === "accent" ? "color" : (editingPart === "title" ? "titleColor" : "backgroundColor")] || "#3b82f6" }}
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Custom Hex</p>
-                        <Input 
-                          value={resumeData.settings?.[editingPart === "accent" ? "color" : (editingPart === "title" ? "titleColor" : "backgroundColor")] || "#3b82f6"}
-                          onChange={(e) => handleColorChange(e.target.value)}
-                          className="h-8 bg-transparent border-white/10 text-xs font-mono text-white"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </section>
 
                 <section>
                   <h3 className="text-lg font-bold mb-4">Templates</h3>
@@ -274,7 +203,7 @@ export default function ReviewPage() {
             className="shadow-[0_20px_50px_rgba(0,0,0,0.3)] bg-white origin-top"
             onClick={() => setActiveTab("design")}
           >
-            <ResumePreview />
+            <ResumePreview ref={resumeRef} />
           </motion.div>
         </div>
 
@@ -282,23 +211,32 @@ export default function ReviewPage() {
         <div className="w-80 border-l border-white/10 bg-[#25375a] flex flex-col shrink-0">
           <div className="p-6 space-y-6">
             <div className="grid grid-cols-3 gap-2">
-              <button className="flex flex-col items-center justify-center gap-2 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10">
+              <button 
+                onClick={() => resumeRef.current?.download()}
+                className="flex flex-col items-center justify-center gap-2 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
+              >
                 <Download className="h-5 w-5" />
                 <span className="text-[10px] font-bold uppercase">Download</span>
               </button>
-              <button className="flex flex-col items-center justify-center gap-2 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10">
+              <button 
+                onClick={() => resumeRef.current?.print()}
+                className="flex flex-col items-center justify-center gap-2 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
+              >
                 <Printer className="h-5 w-5" />
                 <span className="text-[10px] font-bold uppercase">Print</span>
               </button>
-              <button className="flex flex-col items-center justify-center gap-2 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10">
+              <button 
+                onClick={() => resumeRef.current?.email()}
+                className="flex flex-col items-center justify-center gap-2 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
+              >
                 <Mail className="h-5 w-5" />
                 <span className="text-[10px] font-bold uppercase">Email</span>
               </button>
             </div>
 
-            <Link href="/builder/finalize" className="block">
+            <Link href="/dashboard" className="block">
               <Button className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-full shadow-lg shadow-blue-900/20">
-                Save & Next
+                Finish
               </Button>
             </Link>
 

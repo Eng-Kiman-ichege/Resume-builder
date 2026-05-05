@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useResume } from "@/lib/context/ResumeContext";
 import { ResumePreview } from "@/components/ResumePreview";
 import { TemplateSelector } from "@/components/TemplateSelector";
+import { AiSuggestionDialog } from "@/components/AiSuggestionDialog";
 
 export default function SkillsPage() {
   const router = useRouter();
@@ -64,6 +65,9 @@ export default function SkillsPage() {
     }
   };
 
+  const [aiSuggestion, setAiSuggestion] = useState<string>("");
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+
 
   const getAiHelp = async () => {
     setAiLoading(true);
@@ -74,7 +78,8 @@ export default function SkillsPage() {
         body: JSON.stringify({ section: "skills", data: { content: skills } })
       });
       const data = await response.json();
-      alert(data.suggestions || "AI suggested no changes.");
+      setAiSuggestion(data.suggestions || "AI suggested no changes.");
+      setIsAiModalOpen(true);
     } catch (error) {
       console.error("AI error:", error);
     } finally {
@@ -179,7 +184,10 @@ export default function SkillsPage() {
                   {/* Editor Content Area */}
                   <textarea 
                     value={skills}
-                    onChange={(e) => setSkills(e.target.value)}
+                    onChange={(e) => {
+                      setSkills(e.target.value);
+                      updateSection("skills", { content: e.target.value });
+                    }}
                     className="flex-1 w-full p-6 resize-none focus:outline-none text-slate-600 dark:text-slate-300 placeholder:text-slate-400 bg-transparent text-base"
                     placeholder="Add ready-to-use skills or write your own."
                   ></textarea>
@@ -225,6 +233,17 @@ export default function SkillsPage() {
           {loading ? "Saving..." : "Continue"}
         </Button>
       </div>
+
+      <AiSuggestionDialog
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        suggestion={aiSuggestion}
+        onApply={(suggestion) => {
+          const newSkills = skills ? `${skills}\n\n${suggestion}` : suggestion;
+          setSkills(newSkills);
+          updateSection("skills", { content: newSkills });
+        }}
+      />
     </div>
   );
 }

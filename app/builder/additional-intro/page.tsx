@@ -45,13 +45,14 @@ export default function AdditionalIntroPage() {
               {options.map((opt, index) => {
                 const Icon = opt.icon;
                 return (
-                  <button 
+                  <Link 
                     key={index}
+                    href={`/builder/additional?type=${encodeURIComponent(opt.label)}`}
                     className="flex items-center gap-4 p-4 rounded-xl border border-slate-300 dark:border-zinc-700 bg-transparent hover:bg-slate-50 dark:hover:bg-zinc-800/50 hover:border-slate-400 dark:hover:border-zinc-500 transition-all text-left"
                   >
                     <Icon className="h-6 w-6 text-slate-800 dark:text-slate-200" strokeWidth={1.5} />
                     <span className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">{opt.label}</span>
-                  </button>
+                  </Link>
                 );
               })}
             </div>
@@ -64,9 +65,9 @@ export default function AdditionalIntroPage() {
                 </Button>
               </Link>
               
-              <Link href="/builder/additional">
+              <Link href="/builder/finalize">
                 <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 sm:px-12 h-12 sm:h-14 rounded-full text-base sm:text-lg shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5">
-                  Continue
+                  Skip
                 </Button>
               </Link>
             </div>
