@@ -10,16 +10,21 @@ export async function GET(request: Request) {
 
   try {
     const { data, error } = await supabase
-      .from("resumes")
+      .from("cover_letters")
       .select("*")
       .eq("user_id", userId)
-      .single();
+      .order("updated_at", { ascending: false });
 
-    if (error && error.code !== "PGRST116") { // PGRST116 is "No rows found"
+    if (error) {
+      console.error("Fetch cover letters error:", error);
+      // Check if table doesn't exist (Postgres code 42P01)
+      if (error.code === "42P01" || error.message.includes("does not exist")) {
+        return new NextResponse("Table 'cover_letters' does not exist. Please create it in Supabase.", { status: 404 });
+      }
       return new NextResponse(error.message, { status: 500 });
     }
 
-    return NextResponse.json(data || null);
+    return NextResponse.json(data || []);
   } catch (error: any) {
     return new NextResponse(error.message, { status: 500 });
   }

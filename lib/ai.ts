@@ -113,3 +113,29 @@ Only suggest changes for the "summary", "skills", and "experience" sections. Do 
     return null;
   }
 }
+
+export async function generateCoverLetter(jobTitle: string, company: string, resumeData: any) {
+  try {
+    const response = await openai.chat.completions.create({
+      model: process.env.OPENROUTER_MODEL || "google/gemini-2.5-flash",
+      messages: [
+        {
+          role: "system",
+          content: "You are a professional cover letter writer. Your task is to write a compelling, tailored cover letter. Keep it under 300 words. Focus on how the candidate's experience matches the role. Output ONLY the body of the letter (no headers or signatures)."
+        },
+        {
+          role: "user",
+          content: `Write a cover letter body for a ${jobTitle} position at ${company}. 
+          Candidate Name: ${resumeData.header?.firstName} ${resumeData.header?.lastName}
+          Experience: ${JSON.stringify(resumeData.experience)}
+          Skills: ${resumeData.skills?.content}`
+        }
+      ],
+    });
+
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error("Error generating cover letter:", error);
+    return null;
+  }
+}

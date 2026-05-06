@@ -10,12 +10,12 @@ export async function GET(request: Request) {
 
   try {
     const { data, error } = await supabase
-      .from("resumes")
+      .from("cover_letters")
       .select("*")
       .eq("user_id", userId)
       .single();
 
-    if (error && error.code !== "PGRST116") { // PGRST116 is "No rows found"
+    if (error && error.code !== "PGRST116") {
       return new NextResponse(error.message, { status: 500 });
     }
 

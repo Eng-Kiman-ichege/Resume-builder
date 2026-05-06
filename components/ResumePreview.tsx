@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useResume } from "@/lib/context/ResumeContext";
+import { useResume, ResumeContext } from "@/lib/context/ResumeContext";
+import { useContext } from "react";
 import { Sparkles, Loader2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getTemplateComponent } from "@/lib/templates";
@@ -18,12 +19,15 @@ export const ResumePreview = forwardRef(({
   liveExperience,
   liveEducation,
   customTemplateId,
+  data: propData,
 }: {
   liveExperience?: any;
   liveEducation?: any;
   customTemplateId?: string;
+  data?: any;
 }, ref) => {
-  const { resumeData } = useResume();
+  const context = useContext(ResumeContext);
+  const resumeData = propData || context?.resumeData;
   const settings = resumeData.settings || { templateId: "modern-classic" };
   const activeTemplateId = (
     customTemplateId ||

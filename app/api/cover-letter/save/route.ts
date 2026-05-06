@@ -9,16 +9,17 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { section, data } = await req.json();
+    const data = await req.json();
 
-    // Update the resume record for this user
-    // Note: This assumes a single resume per user for simplicity, or we'd need a resumeId
     const { error } = await supabase
-      .from("resumes")
+      .from("cover_letters")
       .upsert(
         { 
           user_id: userId, 
-          [section]: data,
+          sender: data.sender,
+          recipient: data.recipient,
+          content: data.content,
+          settings: data.settings,
           updated_at: new Date().toISOString()
         },
         { onConflict: 'user_id' }

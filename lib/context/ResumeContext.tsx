@@ -41,7 +41,7 @@ const defaultResumeData: ResumeData = {
   },
 };
 
-const ResumeContext = createContext<ResumeContextType | undefined>(undefined);
+export const ResumeContext = createContext<ResumeContextType | undefined>(undefined);
 
 export function ResumeProvider({ children }: { children: React.ReactNode }) {
   const { user, isLoaded } = useUser();

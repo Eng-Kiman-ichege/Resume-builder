@@ -13,13 +13,13 @@ export async function GET(request: Request) {
       .from("resumes")
       .select("*")
       .eq("user_id", userId)
-      .single();
+      .order("updated_at", { ascending: false });
 
-    if (error && error.code !== "PGRST116") { // PGRST116 is "No rows found"
+    if (error) {
       return new NextResponse(error.message, { status: 500 });
     }
 
-    return NextResponse.json(data || null);
+    return NextResponse.json(data || []);
   } catch (error: any) {
     return new NextResponse(error.message, { status: 500 });
   }

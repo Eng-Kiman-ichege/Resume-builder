@@ -13,10 +13,7 @@ export default function DashboardPage() {
   };
 
   const handleCreateCoverLetter = () => {
-    // For now, let's just point to a placeholder or stay on the page
-    // if there's no cover letter builder yet.
-    // router.push("/cover-letter-builder");
-    console.log("Create cover letter clicked");
+    router.push("/cover-letter-builder");
   };
 
   return (
