@@ -153,7 +153,7 @@ export const ResumePreview = forwardRef(({
           <Button
             variant="ghost"
             size="sm"
-            onClick={handleDownload}
+            onClick={() => handleDownload("download")}
             disabled={exporting}
             className="h-auto py-1 text-[9px] font-black uppercase tracking-widest text-blue-600 hover:text-blue-700 hover:bg-blue-50 gap-1.5"
           >

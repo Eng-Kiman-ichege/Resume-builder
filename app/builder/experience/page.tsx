@@ -32,8 +32,6 @@ export default function ExperiencePage() {
     startMonth: "",
     startYear: "",
     endMonth: "",
-    startYear: "",
-    endMonth: "",
     endYear: "",
     description: ""
   });
