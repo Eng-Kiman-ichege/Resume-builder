@@ -18,6 +18,7 @@ export const Madrid = ({ data }: { data: ResumeData }) => {
          <div className="text-right text-xs font-black uppercase tracking-[0.2em] space-y-2 opacity-60">
             <div>{header.email}</div>
             <div>{header.phone}</div>
+            {header.profileLink && (<div>{header.profileLink}</div>)}
             <div>{header.city}</div>
          </div>
       </header>
@@ -53,7 +54,7 @@ export const Madrid = ({ data }: { data: ResumeData }) => {
             <section>
                <h2 className="text-xl font-black uppercase mb-8 border-b-4 border-slate-900 inline-block">Skills</h2>
                <div className="flex flex-wrap gap-2">
-                  {skills.content.split(',').map((skill, i) => (
+                  {(skills?.content || "").split(",").filter(Boolean).map((skill, i) => (
                     <span key={i} className="px-3 py-1.5 bg-slate-100 rounded-xl text-[10px] font-black uppercase text-slate-600 border border-slate-200">
                        {skill.trim()}
                     </span>
@@ -66,7 +67,7 @@ export const Madrid = ({ data }: { data: ResumeData }) => {
                <div className="space-y-8">
                   {education.map((edu, i) => (
                     <div key={i}>
-                       <h4 className="text-lg font-black text-slate-900">{edu.degree}</h4>
+                       <h4 className="text-lg font-black text-slate-900">{edu.degree}{edu.field ? " in " + edu.field : ""}</h4>
                        <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-widest">{edu.institution}</p>
                        <p className="text-[10px] font-black mt-3" style={{ color: accentColor }}>{edu.startYear} — {edu.endYear}</p>
                     </div>

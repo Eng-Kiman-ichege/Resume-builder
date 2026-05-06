@@ -24,6 +24,7 @@ export const BlueExecutive = ({ data }: { data: ResumeData }) => {
       <div className="bg-slate-900 text-white py-3 flex justify-center gap-10 text-[10px] font-black uppercase tracking-[0.2em]">
          <div className="flex items-center gap-2"><AtSign className="h-3 w-3" style={{ color: accentColor }} /> {header.email}</div>
          <div className="flex items-center gap-2"><Smartphone className="h-3 w-3" style={{ color: accentColor }} /> {header.phone}</div>
+         {header.profileLink && (<div className="flex items-center gap-2">{header.profileLabel || "Link"}:  {header.profileLink}</div>)}
          <div className="flex items-center gap-2"><MapPin className="h-3 w-3" style={{ color: accentColor }} /> {header.city}</div>
       </div>
 
@@ -57,7 +58,7 @@ export const BlueExecutive = ({ data }: { data: ResumeData }) => {
              <div className="grid grid-cols-2 gap-8">
                {education.map((edu, i) => (
                  <div key={i} className="space-y-1">
-                   <h4 className="text-lg font-bold text-slate-900">{edu.degree}</h4>
+                   <h4 className="text-lg font-bold text-slate-900">{edu.degree}{edu.field ? " in " + edu.field : ""}</h4>
                    <p className="text-sm font-medium text-slate-500">{edu.institution}</p>
                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">{edu.startYear} — {edu.endYear}</p>
                  </div>

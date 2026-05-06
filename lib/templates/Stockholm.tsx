@@ -16,6 +16,7 @@ export const Stockholm = ({ data }: { data: ResumeData }) => {
          <div className="flex gap-8 mt-8 text-xs font-bold uppercase tracking-widest text-slate-400">
             <span>{header.email}</span>
             <span>{header.phone}</span>
+            {header.profileLink && (<span>{header.profileLink}</span>)}
             <span>{header.city}</span>
          </div>
       </header>
@@ -47,7 +48,7 @@ export const Stockholm = ({ data }: { data: ResumeData }) => {
             <section>
                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-slate-300 mb-8">Expertise</h2>
                <div className="flex flex-wrap gap-2">
-                  {skills.content.split(',').map((skill, i) => (
+                  {(skills?.content || "").split(",").filter(Boolean).map((skill, i) => (
                     <span key={i} className="px-3 py-1 bg-white rounded-lg text-xs font-bold text-slate-600 shadow-sm">
                        {skill.trim()}
                     </span>
@@ -60,7 +61,7 @@ export const Stockholm = ({ data }: { data: ResumeData }) => {
                <div className="space-y-8">
                   {education.map((edu, i) => (
                     <div key={i}>
-                       <h4 className="text-base font-bold text-slate-900">{edu.degree}</h4>
+                       <h4 className="text-base font-bold text-slate-900">{edu.degree}{edu.field ? " in " + edu.field : ""}</h4>
                        <p className="text-xs font-medium text-slate-400 mt-1">{edu.institution}</p>
                     </div>
                   ))}

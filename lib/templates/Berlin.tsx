@@ -19,6 +19,7 @@ export const Berlin = ({ data }: { data: ResumeData }) => {
         <div className="mt-8 grid grid-cols-3 text-[10px] font-black uppercase">
           <div>E: {header.email}</div>
           <div>P: {header.phone}</div>
+          {header.profileLink && (<div>P: {header.profileLink}</div>)}
           <div>L: {header.city}</div>
         </div>
       </header>
@@ -52,7 +53,7 @@ export const Berlin = ({ data }: { data: ResumeData }) => {
              <h2 className="text-xl font-black uppercase mb-6">Education</h2>
              {education.map((edu, i) => (
                <div key={i} className="mb-4">
-                 <h4 className="text-base font-black uppercase">{edu.degree}</h4>
+                 <h4 className="text-base font-black uppercase">{edu.degree}{edu.field ? " in " + edu.field : ""}</h4>
                  <p className="text-xs font-bold uppercase">{edu.institution}</p>
                </div>
              ))}
@@ -60,7 +61,7 @@ export const Berlin = ({ data }: { data: ResumeData }) => {
            <section>
              <h2 className="text-xl font-black uppercase mb-6">Skills</h2>
              <div className="flex flex-wrap gap-2">
-                {skills.content.split(',').map((skill, i) => (
+                {(skills?.content || "").split(",").filter(Boolean).map((skill, i) => (
                   <span key={i} className="border-2 border-black px-2 py-1 text-[10px] font-black uppercase">
                     {skill.trim()}
                   </span>

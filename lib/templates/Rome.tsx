@@ -17,6 +17,7 @@ export const Rome = ({ data }: { data: ResumeData }) => {
            <span>{header.email}</span>
            <span>|</span>
            <span>{header.phone}</span>
+           {header.profileLink && (<span>{header.profileLink}</span>)}
            <span>|</span>
            <span>{header.city}</span>
         </div>
@@ -53,7 +54,7 @@ export const Rome = ({ data }: { data: ResumeData }) => {
               <h2 className="text-xs font-black uppercase tracking-[0.5em] text-slate-300 mb-8 border-b border-slate-100 pb-2">Academic</h2>
               {education.map((edu, i) => (
                 <div key={i} className="mb-6">
-                   <h4 className="text-lg font-bold text-slate-900">{edu.degree}</h4>
+                   <h4 className="text-lg font-bold text-slate-900">{edu.degree}{edu.field ? " in " + edu.field : ""}</h4>
                    <p className="text-sm italic text-slate-500 mt-1">{edu.institution}</p>
                 </div>
               ))}
@@ -62,7 +63,7 @@ export const Rome = ({ data }: { data: ResumeData }) => {
            <section>
               <h2 className="text-xs font-black uppercase tracking-[0.5em] text-slate-300 mb-8 border-b border-slate-100 pb-2">Competencies</h2>
               <div className="space-y-4">
-                 {skills.content.split(',').map((skill, i) => (
+                 {(skills?.content || "").split(",").filter(Boolean).map((skill, i) => (
                    <div key={i} className="text-sm font-bold text-slate-700 border-b border-slate-50 pb-2">
                       {skill.trim()}
                    </div>

@@ -25,6 +25,7 @@ export const Amsterdam = ({ data }: { data: ResumeData }) => {
               <div className="space-y-3 text-xs font-black uppercase tracking-widest leading-relaxed">
                  <div>{header.email}</div>
                  <div>{header.phone}</div>
+                 {header.profileLink && (<div>{header.profileLink}</div>)}
                  <div>{header.city}, {header.country}</div>
               </div>
            </section>
@@ -32,7 +33,7 @@ export const Amsterdam = ({ data }: { data: ResumeData }) => {
            <section className="space-y-6">
               <h2 className="text-xs font-black uppercase tracking-[0.4em] text-white bg-slate-900 px-3 py-1 inline-block">Skills</h2>
               <div className="flex flex-wrap gap-2">
-                 {skills.content.split(',').map((skill, i) => (
+                 {(skills?.content || "").split(",").filter(Boolean).map((skill, i) => (
                    <span key={i} className="px-3 py-1 border-2 border-slate-900 text-[10px] font-black uppercase">
                       {skill.trim()}
                    </span>
@@ -71,7 +72,7 @@ export const Amsterdam = ({ data }: { data: ResumeData }) => {
               <div className="grid grid-cols-2 gap-8">
                  {education.map((edu, i) => (
                    <div key={i}>
-                      <h4 className="text-lg font-black uppercase">{edu.degree}</h4>
+                      <h4 className="text-lg font-black uppercase">{edu.degree}{edu.field ? " in " + edu.field : ""}</h4>
                       <p className="text-xs font-bold text-slate-400 mt-1">{edu.institution}</p>
                    </div>
                  ))}

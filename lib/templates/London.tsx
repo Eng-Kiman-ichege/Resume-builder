@@ -31,6 +31,7 @@ export const London = ({ data }: { data: ResumeData }) => {
           <div className="space-y-3 text-[11px] font-medium text-slate-600">
             <div className="flex items-center gap-3"><AtSign className="h-3.5 w-3.5 opacity-50" /> {header.email}</div>
             <div className="flex items-center gap-3"><Smartphone className="h-3.5 w-3.5 opacity-50" /> {header.phone}</div>
+            {header.profileLink && (<div className="flex items-center gap-3">{header.profileLabel || "Link"}:  {header.profileLink}</div>)}
             <div className="flex items-center gap-3"><MapPin className="h-3.5 w-3.5 opacity-50" /> {header.city}</div>
           </div>
         </div>
@@ -38,7 +39,7 @@ export const London = ({ data }: { data: ResumeData }) => {
         <div className="space-y-4">
           <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300">Skills</h2>
           <div className="flex flex-wrap gap-2">
-            {skills.content.split(',').map((skill, i) => (
+            {(skills?.content || "").split(",").filter(Boolean).map((skill, i) => (
               <span key={i} className="px-2 py-1 bg-white border border-slate-100 text-[9px] font-bold text-slate-500 rounded uppercase">
                 {skill.trim()}
               </span>
@@ -81,7 +82,7 @@ export const London = ({ data }: { data: ResumeData }) => {
           <div className="grid grid-cols-1 gap-6">
             {education.map((edu, i) => (
               <div key={i}>
-                <h4 className="text-sm font-black text-slate-900">{edu.degree}</h4>
+                <h4 className="text-sm font-black text-slate-900">{edu.degree}{edu.field ? " in " + edu.field : ""}</h4>
                 <p className="text-xs font-bold text-slate-500">{edu.institution}</p>
                 <p className="text-[10px] font-bold uppercase mt-1" style={{ color: accentColor }}>{edu.startYear} — {edu.endYear}</p>
               </div>

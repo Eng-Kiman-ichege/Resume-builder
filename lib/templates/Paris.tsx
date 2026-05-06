@@ -21,6 +21,7 @@ export const Paris = ({ data }: { data: ResumeData }) => {
            <span>{header.email}</span>
            <span>•</span>
            <span>{header.phone}</span>
+           {header.profileLink && (<span>{header.profileLink}</span>)}
            <span>•</span>
            <span>{header.city}</span>
         </div>
@@ -52,7 +53,7 @@ export const Paris = ({ data }: { data: ResumeData }) => {
             <div className="space-y-6">
               {education.map((edu, i) => (
                 <div key={i}>
-                  <h4 className="text-base font-bold text-slate-900">{edu.degree}</h4>
+                  <h4 className="text-base font-bold text-slate-900">{edu.degree}{edu.field ? " in " + edu.field : ""}</h4>
                   <p className="text-xs font-medium text-slate-500 italic mt-1">{edu.institution}</p>
                   <p className="text-[10px] font-bold uppercase mt-2" style={{ color: accentColor }}>{edu.startYear} — {edu.endYear}</p>
                 </div>
@@ -63,7 +64,7 @@ export const Paris = ({ data }: { data: ResumeData }) => {
           <section>
             <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-300 mb-6">Expertise</h2>
             <div className="flex flex-wrap justify-start gap-x-6 gap-y-3">
-              {skills.content.split(',').map((skill, i) => (
+              {(skills?.content || "").split(",").filter(Boolean).map((skill, i) => (
                 <span key={i} className="text-xs font-bold text-slate-600 uppercase tracking-widest">
                   {skill.trim()}
                 </span>

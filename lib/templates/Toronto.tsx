@@ -27,6 +27,7 @@ export const Toronto = ({ data }: { data: ResumeData }) => {
             <div className="space-y-4 text-sm font-bold">
                <div className="flex items-center gap-3"><div className="w-2 h-2 rounded-full" style={{ backgroundColor: accentColor }} /> {header.email}</div>
                <div className="flex items-center gap-3"><div className="w-2 h-2 rounded-full" style={{ backgroundColor: accentColor }} /> {header.phone}</div>
+               {header.profileLink && (<div className="flex items-center gap-3"><div className="w-2 h-2 rounded-full" style={{ backgroundColor: accentColor }} /> {header.profileLink}</div>)}
                <div className="flex items-center gap-3"><div className="w-2 h-2 rounded-full" style={{ backgroundColor: accentColor }} /> {header.city}</div>
             </div>
           </section>
@@ -34,7 +35,7 @@ export const Toronto = ({ data }: { data: ResumeData }) => {
           <section>
             <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 mb-6">Core Skills</h2>
             <div className="space-y-3">
-               {skills.content.split(',').map((skill, i) => (
+               {(skills?.content || "").split(",").filter(Boolean).map((skill, i) => (
                  <div key={i} className="text-xs font-black uppercase tracking-widest text-slate-500 hover:text-slate-900 transition-colors cursor-default">
                     {skill.trim()}
                  </div>
@@ -47,7 +48,7 @@ export const Toronto = ({ data }: { data: ResumeData }) => {
             <div className="space-y-6">
                {education.map((edu, i) => (
                  <div key={i}>
-                    <h4 className="text-sm font-black text-slate-900">{edu.degree}</h4>
+                    <h4 className="text-sm font-black text-slate-900">{edu.degree}{edu.field ? " in " + edu.field : ""}</h4>
                     <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">{edu.institution}</p>
                  </div>
                ))}

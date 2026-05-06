@@ -36,6 +36,7 @@ export const Minimalist = ({ data }: { data: ResumeData }) => {
           <div className="flex flex-wrap gap-y-2 gap-x-6 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
             <div className="flex items-center gap-1.5"><AtSign className="h-3 w-3" style={{ color: accentColor }} /> {header.email}</div>
             <div className="flex items-center gap-1.5"><Smartphone className="h-3 w-3" style={{ color: accentColor }} /> {header.phone}</div>
+            {header.profileLink && (<div className="flex items-center gap-1.5">{header.profileLabel || "Link"}:  {header.profileLink}</div>)}
             <div className="flex items-center gap-1.5"><MapPin className="h-3 w-3" style={{ color: accentColor }} /> {header.city}, {header.country}</div>
           </div>
         </div>
@@ -82,7 +83,7 @@ export const Minimalist = ({ data }: { data: ResumeData }) => {
               <div className="space-y-6">
                 {education.map((edu, i) => (
                   <div key={i}>
-                    <h4 className="text-sm font-bold text-slate-900">{edu.degree}</h4>
+                    <h4 className="text-sm font-bold text-slate-900">{edu.degree}{edu.field ? " in " + edu.field : ""}</h4>
                     <p className="text-[11px] font-bold uppercase tracking-wider mt-1" style={{ color: accentColor }}>{edu.institution}</p>
                     <p className="text-[10px] font-medium text-slate-400 mt-0.5">{edu.startYear} — {edu.endYear}</p>
                   </div>
@@ -93,7 +94,7 @@ export const Minimalist = ({ data }: { data: ResumeData }) => {
             <section>
               <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-6">Skills</h2>
               <div className="flex flex-wrap gap-2">
-                {skills.content.split(',').map((skill, i) => (
+                {(skills?.content || "").split(",").filter(Boolean).map((skill, i) => (
                   <span key={i} className="px-2.5 py-1 bg-slate-50 text-[10px] font-bold text-slate-600 rounded-md uppercase tracking-wider border border-slate-100">
                     {skill.trim()}
                   </span>

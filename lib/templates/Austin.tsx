@@ -17,6 +17,7 @@ export const Austin = ({ data }: { data: ResumeData }) => {
          <div className="flex gap-6 text-[10px] font-black uppercase tracking-widest opacity-60">
             <span>{header.email}</span>
             <span>{header.phone}</span>
+            {header.profileLink && (<span>{header.profileLink}</span>)}
             <span>{header.city}</span>
          </div>
       </header>
@@ -51,7 +52,7 @@ export const Austin = ({ data }: { data: ResumeData }) => {
                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-slate-300 mb-8">Education</h2>
                {education.map((edu, i) => (
                  <div key={i} className="mb-6">
-                    <h4 className="text-lg font-black text-slate-900">{edu.degree}</h4>
+                    <h4 className="text-lg font-black text-slate-900">{edu.degree}{edu.field ? " in " + edu.field : ""}</h4>
                     <p className="text-sm font-bold text-slate-400 mt-1">{edu.institution}</p>
                  </div>
                ))}
@@ -59,7 +60,7 @@ export const Austin = ({ data }: { data: ResumeData }) => {
             <section>
                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-slate-300 mb-8">Tech Stack</h2>
                <div className="flex flex-wrap gap-2">
-                  {skills.content.split(',').map((skill, i) => (
+                  {(skills?.content || "").split(",").filter(Boolean).map((skill, i) => (
                     <span key={i} className="px-3 py-1.5 bg-slate-900 text-white rounded text-[10px] font-black uppercase tracking-widest">
                        {skill.trim()}
                     </span>

@@ -22,6 +22,7 @@ export const NewYork = ({ data }: { data: ResumeData }) => {
           <p className="text-xl text-slate-900 mb-4">{header.jobTitle}</p>
           <div className="flex items-center gap-3">{header.email} <AtSign className="h-4 w-4" style={{ color: accentColor }} /></div>
           <div className="flex items-center gap-3">{header.phone} <Smartphone className="h-4 w-4" style={{ color: accentColor }} /></div>
+          {header.profileLink && (<div className="flex items-center gap-3">{header.profileLink} {header.profileLabel || "Link"}: </div>)}
           <div className="flex items-center gap-3">{header.city}, {header.country} <MapPin className="h-4 w-4" style={{ color: accentColor }} /></div>
         </div>
       </header>
@@ -62,7 +63,7 @@ export const NewYork = ({ data }: { data: ResumeData }) => {
             <div className="space-y-8">
               {education.map((edu, i) => (
                 <div key={i}>
-                  <h4 className="text-lg font-black text-slate-900">{edu.degree}</h4>
+                  <h4 className="text-lg font-black text-slate-900">{edu.degree}{edu.field ? " in " + edu.field : ""}</h4>
                   <p className="text-sm font-bold text-slate-500 mt-1 uppercase tracking-wider" style={{ color: accentColor }}>{edu.institution}</p>
                   <p className="text-xs font-black text-slate-300 uppercase mt-2">{edu.startYear} — {edu.endYear}</p>
                 </div>
@@ -73,7 +74,7 @@ export const NewYork = ({ data }: { data: ResumeData }) => {
           <section>
             <h2 className="text-xl font-black uppercase tracking-tighter text-slate-900 mb-8 pb-4 border-b-4 border-slate-100">Core Skills</h2>
             <div className="space-y-4">
-              {skills.content.split(',').map((skill, i) => (
+              {(skills?.content || "").split(",").filter(Boolean).map((skill, i) => (
                 <div key={i} className="flex flex-col gap-1.5">
                   <div className="flex justify-between text-[11px] font-black uppercase tracking-widest">
                      <span className="text-slate-600">{skill.trim()}</span>

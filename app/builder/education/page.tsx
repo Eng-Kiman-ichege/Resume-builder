@@ -9,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 
 import { useRouter } from "next/navigation";
-import { Wand2, Trash2, Plus } from "lucide-react";
+import { Wand2, Trash2, Plus, Edit2 } from "lucide-react";
 
 import { useResume } from "@/lib/context/ResumeContext";
 import { ResumePreview } from "@/components/ResumePreview";
@@ -28,8 +28,10 @@ export default function EducationPage() {
     degree: "",
     field: "",
     gradMonth: "",
-    gradYear: ""
+    gradYear: "",
+    description: ""
   });
+  const [showDetails, setShowDetails] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
@@ -49,6 +51,23 @@ export default function EducationPage() {
     } catch (error) {
       console.error("Delete error:", error);
     }
+  };
+
+  const handleEdit = (index: number) => {
+    const eduToEdit = resumeData.education[index];
+    setFormData({
+      institution: eduToEdit.institution || "",
+      location: eduToEdit.location || "",
+      degree: eduToEdit.degree || "",
+      field: eduToEdit.field || "",
+      gradMonth: eduToEdit.gradMonth || "",
+      gradYear: eduToEdit.gradYear || "",
+      description: eduToEdit.description || ""
+    });
+    setStillEnrolled(eduToEdit.isStillEnrolled || false);
+    
+    // Delete the original item so it can be re-added on save
+    handleDelete(index);
   };
 
   const handleAddAnother = async () => {
@@ -80,9 +99,11 @@ export default function EducationPage() {
       degree: "",
       field: "",
       gradMonth: "",
-      gradYear: ""
+      gradYear: "",
+      description: ""
     });
     setStillEnrolled(false);
+    setShowDetails(false);
   };
 
   const handleSaveAndContinue = async () => {
@@ -194,14 +215,24 @@ export default function EducationPage() {
                         <div className="font-bold text-slate-900 dark:text-white">{edu.degree}</div>
                         <div className="text-sm text-slate-500">{edu.institution} | {edu.gradYear}</div>
                       </div>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => handleDelete(index)}
-                        className="text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => handleEdit(index)}
+                          className="text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => handleDelete(index)}
+                          className="text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -316,10 +347,28 @@ export default function EducationPage() {
               </div>
 
               {/* Add Details Collapse */}
-              <button className="w-full bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 rounded-lg p-4 flex items-center justify-between shadow-sm hover:bg-slate-50 dark:hover:bg-zinc-900 transition-colors">
+              <button 
+                onClick={() => setShowDetails(!showDetails)}
+                className="w-full bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 rounded-lg p-4 flex items-center justify-between shadow-sm hover:bg-slate-50 dark:hover:bg-zinc-900 transition-colors"
+              >
                 <span className="font-bold text-slate-900 dark:text-white">Add education details</span>
-                <ChevronDown className="h-5 w-5 text-slate-500" />
+                <ChevronDown className={`h-5 w-5 text-slate-500 transition-transform ${showDetails ? "rotate-180" : ""}`} />
               </button>
+
+              {showDetails && (
+                <div className="grid grid-cols-1 gap-6 animate-in slide-in-from-top-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="description" className="text-slate-600 dark:text-slate-400 font-medium">Description (Honors, Clubs, Projects)</Label>
+                    <textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={handleChange as any}
+                      placeholder="e.g. Graduated Cum Laude. Member of the Debate Club..."
+                      className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 min-h-[120px] resize-y bg-white dark:bg-black focus-visible:ring-blue-500 ring-1 ring-transparent border-slate-200 dark:border-zinc-800"
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Pro Tip */}
               <div className="flex items-start gap-3 pt-2">

@@ -20,6 +20,7 @@ export const Singapore = ({ data }: { data: ResumeData }) => {
             <div className="space-y-4 text-[11px] font-bold tracking-widest text-white/80">
                <div className="flex items-center gap-3"><AtSign className="h-3.5 w-3.5 text-teal-400" style={{ color: accentColor }} /> {header.email}</div>
                <div className="flex items-center gap-3"><Smartphone className="h-3.5 w-3.5 text-teal-400" style={{ color: accentColor }} /> {header.phone}</div>
+               {header.profileLink && (<div className="flex items-center gap-3">{header.profileLabel || "Link"}:  {header.profileLink}</div>)}
                <div className="flex items-center gap-3"><MapPin className="h-3.5 w-3.5 text-teal-400" style={{ color: accentColor }} /> {header.city}</div>
             </div>
          </div>
@@ -27,7 +28,7 @@ export const Singapore = ({ data }: { data: ResumeData }) => {
          <div className="space-y-6">
             <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Competencies</h2>
             <div className="flex flex-col gap-3">
-               {skills.content.split(',').map((skill, i) => (
+               {(skills?.content || "").split(",").filter(Boolean).map((skill, i) => (
                  <div key={i} className="flex flex-col gap-1.5">
                     <span className="text-[10px] font-black uppercase tracking-widest">{skill.trim()}</span>
                     <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
@@ -80,7 +81,7 @@ export const Singapore = ({ data }: { data: ResumeData }) => {
             <div className="grid grid-cols-2 gap-10">
                {education.map((edu, i) => (
                  <div key={i}>
-                    <h4 className="text-lg font-black text-slate-900">{edu.degree}</h4>
+                    <h4 className="text-lg font-black text-slate-900">{edu.degree}{edu.field ? " in " + edu.field : ""}</h4>
                     <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-widest" style={{ color: accentColor }}>{edu.institution}</p>
                  </div>
                ))}

@@ -18,6 +18,7 @@ export const Seoul = ({ data }: { data: ResumeData }) => {
               <span className="px-3 py-1 bg-slate-900 text-white rounded shadow-lg">{header.jobTitle}</span>
               <span>{header.email}</span>
               <span>{header.phone}</span>
+              {header.profileLink && (<span>{header.profileLink}</span>)}
            </div>
         </header>
 
@@ -45,7 +46,7 @@ export const Seoul = ({ data }: { data: ResumeData }) => {
              <section className="space-y-8">
                <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-300">Skills</h2>
                <div className="flex flex-wrap gap-3">
-                  {skills.content.split(',').map((skill, i) => (
+                  {(skills?.content || "").split(",").filter(Boolean).map((skill, i) => (
                     <span key={i} className="px-3 py-1 border-2 border-slate-100 text-[11px] font-black uppercase text-slate-500 hover:border-slate-900 hover:text-slate-900 transition-colors">
                       {skill.trim()}
                     </span>
@@ -58,7 +59,7 @@ export const Seoul = ({ data }: { data: ResumeData }) => {
                <div className="space-y-6">
                   {education.map((edu, i) => (
                     <div key={i}>
-                       <h4 className="text-base font-black text-slate-900">{edu.degree}</h4>
+                       <h4 className="text-base font-black text-slate-900">{edu.degree}{edu.field ? " in " + edu.field : ""}</h4>
                        <p className="text-xs font-bold text-slate-400 mt-1">{edu.institution}</p>
                     </div>
                   ))}

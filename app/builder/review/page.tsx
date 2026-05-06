@@ -14,6 +14,8 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { TEMPLATES as templates, colors } from "@/lib/templates";
 import { cn } from "@/lib/utils";
+import { AiAutoReviewDialog } from "@/components/AiAutoReviewDialog";
+import { Wand2 } from "lucide-react";
 
 export default function ReviewPage() {
   const { resumeData, updateSection } = useResume();
@@ -22,6 +24,10 @@ export default function ReviewPage() {
   const [dbTemplates, setDbTemplates] = useState<any[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
   
+  const [aiLoading, setAiLoading] = useState(false);
+  const [autoSuggestions, setAutoSuggestions] = useState<any[]>([]);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+
   const resumeRef = useRef<any>(null);
 
   useEffect(() => {
@@ -79,6 +85,64 @@ export default function ReviewPage() {
         data: { ...resumeData.settings, templateId } 
       })
     });
+  };
+
+  const getFullResumeAiReview = async () => {
+    setAiLoading(true);
+    try {
+      const response = await fetch("/api/ai/auto-review", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: resumeData })
+      });
+      const data = await response.json();
+      setAutoSuggestions(data.suggestions || []);
+      setIsAiModalOpen(true);
+    } catch (error) {
+      console.error("AI error:", error);
+      alert("Failed to generate review. Please try again.");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleApplySuggestion = async (suggestion: any, idx: number) => {
+    try {
+      if (suggestion.section === "summary" || suggestion.section === "skills") {
+        const newData = { ...resumeData[suggestion.section as keyof typeof resumeData], content: suggestion.proposedContent };
+        updateSection(suggestion.section as any, newData);
+        
+        await fetch("/api/resume/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ section: suggestion.section, data: newData })
+        });
+      } else if (suggestion.section === "experience" && suggestion.index !== undefined) {
+        const newExperienceList = [...resumeData.experience];
+        if (newExperienceList[suggestion.index]) {
+          newExperienceList[suggestion.index] = {
+            ...newExperienceList[suggestion.index],
+            description: suggestion.proposedContent
+          };
+          updateSection("experience", newExperienceList);
+          
+          await fetch("/api/resume/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ section: "experience", data: newExperienceList })
+          });
+        }
+      }
+
+      // Remove the applied suggestion
+      setAutoSuggestions(prev => prev.filter((_, i) => i !== idx));
+      
+      if (autoSuggestions.length <= 1) {
+        setIsAiModalOpen(false);
+      }
+    } catch (error) {
+      console.error("Apply error:", error);
+    }
   };
 
   return (
@@ -242,6 +306,17 @@ export default function ReviewPage() {
 
             <div className="h-px bg-white/10 my-4" />
 
+            <button 
+              onClick={getFullResumeAiReview}
+              disabled={aiLoading}
+              className="w-full flex items-center justify-between text-slate-300 hover:text-white transition-colors group"
+            >
+              <div className="flex items-center gap-2">
+                {aiLoading ? <Loader2 className="h-5 w-5 text-purple-400 animate-spin" /> : <Wand2 className="h-5 w-5 text-purple-400" />}
+                <span className="font-bold">{aiLoading ? "Reviewing..." : "AI Resume Review"}</span>
+              </div>
+            </button>
+
             <button className="w-full flex items-center justify-between text-slate-300 hover:text-white transition-colors group">
               <div className="flex items-center gap-2">
                 <SpellCheck className="h-5 w-5 text-amber-400" />
@@ -277,6 +352,13 @@ export default function ReviewPage() {
           </div>
         </div>
       </div>
+
+      <AiAutoReviewDialog
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        suggestions={autoSuggestions}
+        onApply={handleApplySuggestion}
+      />
     </div>
   );
 }

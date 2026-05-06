@@ -23,6 +23,7 @@ export const Seattle = ({ data }: { data: ResumeData }) => {
          <div className="text-right text-[11px] font-black uppercase tracking-widest space-y-3 opacity-60 relative z-10">
             <div>{header.email}</div>
             <div>{header.phone}</div>
+            {header.profileLink && (<div>{header.profileLink}</div>)}
             <div>{header.city}</div>
          </div>
       </header>
@@ -32,7 +33,7 @@ export const Seattle = ({ data }: { data: ResumeData }) => {
             <section>
                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-slate-300 mb-6">Expertise</h2>
                <div className="space-y-4">
-                  {skills.content.split(',').map((skill, i) => (
+                  {(skills?.content || "").split(",").filter(Boolean).map((skill, i) => (
                     <div key={i} className="space-y-2">
                        <div className="flex justify-between text-[10px] font-black uppercase">
                           <span>{skill.trim()}</span>
@@ -50,7 +51,7 @@ export const Seattle = ({ data }: { data: ResumeData }) => {
                <div className="space-y-6">
                   {education.map((edu, i) => (
                     <div key={i}>
-                       <h4 className="text-base font-black text-slate-900">{edu.degree}</h4>
+                       <h4 className="text-base font-black text-slate-900">{edu.degree}{edu.field ? " in " + edu.field : ""}</h4>
                        <p className="text-xs font-bold text-slate-400 mt-1">{edu.institution}</p>
                        <p className="text-[10px] font-black mt-2 opacity-30">{edu.startYear} — {edu.endYear}</p>
                     </div>

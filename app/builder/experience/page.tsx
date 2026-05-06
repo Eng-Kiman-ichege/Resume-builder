@@ -9,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 
 import { useRouter } from "next/navigation";
-import { Wand2, Trash2, Plus } from "lucide-react";
+import { Wand2, Trash2, Plus, Edit2, Sparkles } from "lucide-react";
 
 import { useResume } from "@/lib/context/ResumeContext";
 import { ResumePreview } from "@/components/ResumePreview";
@@ -22,6 +22,7 @@ export default function ExperiencePage() {
   const [currentlyWorkHere, setCurrentlyWorkHere] = useState(false);
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiDescLoading, setAiDescLoading] = useState(false);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
   const [formData, setFormData] = useState({
     jobTitle: "",
@@ -31,7 +32,10 @@ export default function ExperiencePage() {
     startMonth: "",
     startYear: "",
     endMonth: "",
-    endYear: ""
+    startYear: "",
+    endMonth: "",
+    endYear: "",
+    description: ""
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -53,6 +57,25 @@ export default function ExperiencePage() {
     } catch (error) {
       console.error("Delete error:", error);
     }
+  };
+
+  const handleEdit = (index: number) => {
+    const expToEdit = resumeData.experience[index];
+    setFormData({
+      jobTitle: expToEdit.jobTitle || "",
+      employer: expToEdit.employer || "",
+      city: expToEdit.city || "",
+      country: expToEdit.country || "",
+      startMonth: expToEdit.startMonth || "",
+      startYear: expToEdit.startYear || "",
+      endMonth: expToEdit.endMonth || "",
+      endYear: expToEdit.endYear || "",
+      description: expToEdit.description || ""
+    });
+    setCurrentlyWorkHere(expToEdit.isCurrent || false);
+    
+    // Delete the original item so it can be re-added on save
+    handleDelete(index);
   };
 
   const handleAddAnother = async () => {
@@ -86,7 +109,8 @@ export default function ExperiencePage() {
       startMonth: "",
       startYear: "",
       endMonth: "",
-      endYear: ""
+      endYear: "",
+      description: ""
     });
     setCurrentlyWorkHere(false);
   };
@@ -160,6 +184,37 @@ export default function ExperiencePage() {
     }
   };
 
+  const handleGenerateDescription = async () => {
+    if (!formData.jobTitle) {
+      alert("Please enter a Job Title first to generate a description.");
+      return;
+    }
+    
+    setAiDescLoading(true);
+    try {
+      const response = await fetch("/api/ai/generate-description", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          jobTitle: formData.jobTitle,
+          employer: formData.employer 
+        })
+      });
+      const data = await response.json();
+      
+      if (data.description) {
+        setFormData(prev => ({ 
+          ...prev, 
+          description: prev.description ? prev.description + "\n" + data.description : data.description 
+        }));
+      }
+    } catch (error) {
+      console.error("AI Generation error:", error);
+    } finally {
+      setAiDescLoading(false);
+    }
+  };
+
   const isFormActive = Object.values(formData).some(val => val !== "");
 
   return (
@@ -220,14 +275,24 @@ export default function ExperiencePage() {
                           <div className="font-bold text-slate-900 dark:text-white">{exp.jobTitle}</div>
                           <div className="text-sm text-slate-500">{exp.employer} | {exp.startYear} - {exp.isCurrent ? "Present" : exp.endYear}</div>
                         </div>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => handleDelete(index)}
-                          className="text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => handleEdit(index)}
+                            className="text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => handleDelete(index)}
+                            className="text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -349,6 +414,39 @@ export default function ExperiencePage() {
                   </div>
                 </div>
               </div>
+
+              {/* Row 4: Description */}
+              <div className="grid grid-cols-1 gap-6">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="description" className="text-slate-600 dark:text-slate-400 font-medium">Description</Label>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={handleGenerateDescription}
+                      disabled={aiDescLoading || !formData.jobTitle}
+                      className="h-8 gap-1.5 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    >
+                      {aiDescLoading ? (
+                        <>Generating...</>
+                      ) : (
+                        <>
+                          <Sparkles className="h-3.5 w-3.5" />
+                          Auto-Generate
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  <textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={handleChange as any}
+                    placeholder="Describe your responsibilities and achievements..."
+                    className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 min-h-[120px] resize-y bg-white dark:bg-black focus-visible:ring-blue-500 ring-1 ring-transparent border-slate-200 dark:border-zinc-800"
+                  />
+                </div>
+              </div>
+
             </div>
           </div>
         </div>

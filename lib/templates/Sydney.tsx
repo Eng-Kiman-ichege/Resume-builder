@@ -24,6 +24,7 @@ export const Sydney = ({ data }: { data: ResumeData }) => {
         <div className="text-[11px] font-bold text-right space-y-2 text-slate-400 uppercase tracking-widest">
            <div className="flex items-center justify-end gap-3">{header.email} <Mail className="h-3.5 w-3.5" style={{ color: accentColor }} /></div>
            <div className="flex items-center justify-end gap-3">{header.phone} <Phone className="h-3.5 w-3.5" style={{ color: accentColor }} /></div>
+           {header.profileLink && (<div className="flex items-center justify-end gap-3">{header.profileLink} {header.profileLabel || "Link"}: </div>)}
            <div className="flex items-center justify-end gap-3">{header.city} <MapPin className="h-3.5 w-3.5" style={{ color: accentColor }} /></div>
         </div>
       </header>
@@ -68,7 +69,7 @@ export const Sydney = ({ data }: { data: ResumeData }) => {
                    <div className="h-px flex-1 bg-slate-100" />
                 </div>
                 <div className="flex flex-wrap gap-2">
-                   {skills.content.split(',').map((skill, i) => (
+                   {(skills?.content || "").split(",").filter(Boolean).map((skill, i) => (
                      <span key={i} className="px-4 py-2 bg-white rounded-full border border-slate-100 text-[11px] font-bold text-slate-600 shadow-sm hover:shadow-md transition-shadow">
                        {skill.trim()}
                      </span>
@@ -84,7 +85,7 @@ export const Sydney = ({ data }: { data: ResumeData }) => {
                 <div className="space-y-6">
                    {education.map((edu, i) => (
                      <div key={i} className="border-l-4 pl-4" style={{ borderColor: accentColor }}>
-                        <h4 className="text-base font-black text-slate-900">{edu.degree}</h4>
+                        <h4 className="text-base font-black text-slate-900">{edu.degree}{edu.field ? " in " + edu.field : ""}</h4>
                         <p className="text-xs font-bold text-slate-400 mt-1">{edu.institution}</p>
                      </div>
                    ))}

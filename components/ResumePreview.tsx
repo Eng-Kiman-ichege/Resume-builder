@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { getTemplateComponent } from "@/lib/templates";
 import { toPng } from "html-to-image";
 import jsPDF from "jspdf";
+import { usePathname } from "next/navigation";
 
 const A4_W = 794;  // A4 width in px at 96 dpi
 const A4_H = 1123; // A4 height in px at 96 dpi
@@ -29,6 +30,9 @@ export const ResumePreview = forwardRef(({
     settings.templateId ||
     "modern-classic"
   ).toLowerCase();
+
+  const pathname = usePathname();
+  const showDownloadButton = pathname === "/builder/finalize";
 
   const [scale, setScale] = useState(0.5);
   const [exporting, setExporting] = useState(false);
@@ -138,28 +142,30 @@ export const ResumePreview = forwardRef(({
       className="w-full h-full flex flex-col items-center overflow-y-auto bg-slate-100 dark:bg-zinc-900/60 py-4 px-4 gap-4"
     >
       {/* ── Action Bar ── */}
-      <div className="flex-shrink-0 self-center flex items-center gap-3 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl px-3 py-2 rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-lg">
-        <div className="flex items-center gap-2 px-3 py-1 border-r border-slate-100 dark:border-zinc-800">
-          <Sparkles className="h-3.5 w-3.5 text-blue-600 animate-pulse" />
-          <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">
-            Live Canva Engine
-          </span>
+      {showDownloadButton && (
+        <div className="flex-shrink-0 self-center flex items-center gap-3 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl px-3 py-2 rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-lg">
+          <div className="flex items-center gap-2 px-3 py-1 border-r border-slate-100 dark:border-zinc-800">
+            <Sparkles className="h-3.5 w-3.5 text-blue-600 animate-pulse" />
+            <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">
+              Live Canva Engine
+            </span>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleDownload}
+            disabled={exporting}
+            className="h-auto py-1 text-[9px] font-black uppercase tracking-widest text-blue-600 hover:text-blue-700 hover:bg-blue-50 gap-1.5"
+          >
+            {exporting ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : (
+              <Download className="h-3 w-3" />
+            )}
+            {exporting ? "Exporting..." : "Download PDF"}
+          </Button>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleDownload}
-          disabled={exporting}
-          className="h-auto py-1 text-[9px] font-black uppercase tracking-widest text-blue-600 hover:text-blue-700 hover:bg-blue-50 gap-1.5"
-        >
-          {exporting ? (
-            <Loader2 className="h-3 w-3 animate-spin" />
-          ) : (
-            <Download className="h-3 w-3" />
-          )}
-          {exporting ? "Exporting..." : "Download PDF"}
-        </Button>
-      </div>
+      )}
 
       {/* ── Stage ──
           The outer div collapses to the *visual* (scaled) size so the layout

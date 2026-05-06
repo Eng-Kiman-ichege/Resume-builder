@@ -22,6 +22,12 @@ export const Milan = ({ data }: { data: ResumeData }) => {
             <span style={{ color: accentColor }}>{header.jobTitle}</span>
             <span className="text-2xl font-light opacity-20 px-8">/</span>
             <span>{header.email}</span>
+            {header.profileLink && (
+              <>
+                <span className="text-2xl font-light opacity-20 px-8">/</span>
+                <span>{header.profileLabel || "Link"}: {header.profileLink}</span>
+              </>
+            )}
          </div>
          <div className="h-0.5 w-full bg-slate-900 mt-4" />
       </header>
@@ -52,7 +58,7 @@ export const Milan = ({ data }: { data: ResumeData }) => {
                <div className="space-y-8">
                   {education.map((edu, i) => (
                     <div key={i}>
-                       <h4 className="text-xl font-bold text-slate-900">{edu.degree}</h4>
+                       <h4 className="text-xl font-bold text-slate-900">{edu.degree}{edu.field ? " in " + edu.field : ""}</h4>
                        <p className="text-sm italic text-slate-400 mt-1">{edu.institution}</p>
                        <p className="text-xs font-black text-slate-200 mt-3">{edu.startYear} — {edu.endYear}</p>
                     </div>
@@ -63,7 +69,7 @@ export const Milan = ({ data }: { data: ResumeData }) => {
             <section className="space-y-8">
                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-slate-300">Skills</h2>
                <div className="flex flex-col gap-4">
-                  {skills.content.split(',').map((skill, i) => (
+                  {(skills?.content || "").split(",").filter(Boolean).map((skill, i) => (
                     <div key={i} className="flex items-center justify-between group">
                        <span className="text-sm font-bold text-slate-700 uppercase tracking-widest group-hover:translate-x-2 transition-transform">{skill.trim()}</span>
                        <div className="w-12 h-0.5 bg-slate-100 group-hover:w-20 transition-all duration-500" style={{ backgroundColor: accentColor }} />

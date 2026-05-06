@@ -25,6 +25,7 @@ export const Tokyo = ({ data }: { data: ResumeData }) => {
         <div className="text-right text-[10px] font-bold space-y-1">
           <div>EMAIL: {header.email}</div>
           <div>PHONE: {header.phone}</div>
+          {header.profileLink && (<div>PHONE: {header.profileLink}</div>)}
           <div>LOC: {header.city}</div>
         </div>
       </header>
@@ -37,7 +38,7 @@ export const Tokyo = ({ data }: { data: ResumeData }) => {
                [01] Skills
             </h2>
             <div className="space-y-4">
-              {skills.content.split(',').map((skill, i) => (
+              {(skills?.content || "").split(",").filter(Boolean).map((skill, i) => (
                 <div key={i} className="flex items-center justify-between group">
                    <span className="text-xs uppercase group-hover:text-white transition-colors">{skill.trim()}</span>
                    <div className="flex gap-1">
@@ -57,7 +58,7 @@ export const Tokyo = ({ data }: { data: ResumeData }) => {
             <div className="space-y-6">
               {education.map((edu, i) => (
                 <div key={i} className="space-y-1">
-                  <h4 className="text-xs font-bold text-zinc-200 uppercase">{edu.degree}</h4>
+                  <h4 className="text-xs font-bold text-zinc-200 uppercase">{edu.degree}{edu.field ? " in " + edu.field : ""}</h4>
                   <p className="text-[10px] text-zinc-500 font-black">{edu.institution}</p>
                   <p className="text-[10px] opacity-50" style={{ color: accentColor }}>{edu.startYear} - {edu.endYear}</p>
                 </div>
