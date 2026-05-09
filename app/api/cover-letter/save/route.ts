@@ -10,23 +10,34 @@ export async function POST(req: Request) {
     }
 
     const data = await req.json();
+    const { id, ...payload } = data;
 
-    const { error } = await supabase
-      .from("cover_letters")
-      .upsert(
-        { 
-          user_id: userId, 
-          sender: data.sender,
-          recipient: data.recipient,
-          content: data.content,
-          settings: data.settings,
-          updated_at: new Date().toISOString()
-        },
-        { onConflict: 'user_id' }
-      );
+    const dbPayload = { 
+      user_id: userId, 
+      sender: data.sender,
+      recipient: data.recipient,
+      content: data.content,
+      settings: data.settings,
+      updated_at: new Date().toISOString()
+    };
 
-    if (error) {
-      console.error("Supabase error:", error);
+    let result;
+    if (id) {
+      // Update existing
+      result = await supabase
+        .from("cover_letters")
+        .update(dbPayload)
+        .eq("id", id)
+        .eq("user_id", userId);
+    } else {
+      // Insert new
+      result = await supabase
+        .from("cover_letters")
+        .insert(dbPayload);
+    }
+
+    if (result.error) {
+      console.error("Supabase error:", result.error);
       return new NextResponse("Database Error", { status: 500 });
     }
 

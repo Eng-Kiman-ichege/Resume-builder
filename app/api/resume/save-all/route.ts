@@ -9,34 +9,40 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { resumeData } = await req.json();
+    const { resumeData, resumeId } = await req.json();
 
     if (!resumeData) {
       return new NextResponse("Resume data is required", { status: 400 });
     }
 
-    // Update the resume record for this user
-    // We upsert all fields at once, mapping settings to template_id and colors
-    const { error } = await supabase
-      .from("resumes")
-      .upsert(
-        { 
-          user_id: userId, 
-          header: resumeData.header,
-          experience: resumeData.experience,
-          education: resumeData.education,
-          skills: resumeData.skills,
-          summary: resumeData.summary,
-          additional: resumeData.additional,
-          template_id: resumeData.settings?.templateId || 'modern-classic',
-          colors: resumeData.settings, // Store the full settings object in colors for retrieval
-          updated_at: new Date().toISOString()
-        },
-        { onConflict: 'user_id' }
-      );
+    const payload = { 
+      user_id: userId, 
+      header: resumeData.header,
+      experience: resumeData.experience,
+      education: resumeData.education,
+      skills: resumeData.skills,
+      summary: resumeData.summary,
+      additional: resumeData.additional,
+      template_id: resumeData.settings?.templateId || 'modern-classic',
+      colors: resumeData.settings,
+      updated_at: new Date().toISOString()
+    };
 
-    if (error) {
-      console.error("Supabase error:", error);
+    let result;
+    if (resumeId) {
+      result = await supabase
+        .from("resumes")
+        .update(payload)
+        .eq("id", resumeId)
+        .eq("user_id", userId);
+    } else {
+      result = await supabase
+        .from("resumes")
+        .insert(payload);
+    }
+
+    if (result.error) {
+      console.error("Supabase error:", result.error);
       return new NextResponse("Database Error", { status: 500 });
     }
 

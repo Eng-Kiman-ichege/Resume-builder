@@ -21,9 +21,9 @@ export type ResumeData = {
 type ResumeContextType = {
   resumeData: ResumeData;
   setResumeData: React.Dispatch<React.SetStateAction<ResumeData>>;
-  updateSection: (section: keyof ResumeData, data: any) => void;
+  updateSection: (section: keyof ResumeData, data: any | ((prev: any) => any)) => void;
   loading: boolean;
-  refreshData: () => Promise<void>;
+  refreshData: (resumeId?: string) => Promise<void>;
 };
 
 const defaultResumeData: ResumeData = {
@@ -48,10 +48,15 @@ export function ResumeProvider({ children }: { children: React.ReactNode }) {
   const [resumeData, setResumeData] = useState<ResumeData>(defaultResumeData);
   const [loading, setLoading] = useState(true);
 
-  const refreshData = async () => {
+  const refreshData = async (resumeId?: string) => {
     if (!user) return;
     try {
-      const response = await fetch(`/api/resume/get?userId=${user.id}`);
+      setLoading(true);
+      const url = resumeId 
+        ? `/api/resume/get?userId=${user.id}&id=${resumeId}`
+        : `/api/resume/get?userId=${user.id}`;
+        
+      const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
         if (data) {
@@ -66,7 +71,7 @@ export function ResumeProvider({ children }: { children: React.ReactNode }) {
               color: "#3b82f6", 
               titleColor: "#0f172a", 
               backgroundColor: "#ffffff", 
-              templateId: "classic" 
+              templateId: "modern-classic" 
             },
           });
         }

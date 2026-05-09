@@ -35,7 +35,18 @@ export default function ContentPage() {
       
       const data = await response.json();
       if (data.body) {
-        updateSection("content", { body: data.body });
+        const updatedContent = { body: data.body };
+        updateSection("content", updatedContent);
+        
+        // Auto-save the generated content
+        await fetch("/api/cover-letter/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...coverLetterData,
+            content: updatedContent
+          }),
+        });
       }
     } catch (error) {
       console.error("AI Error:", error);

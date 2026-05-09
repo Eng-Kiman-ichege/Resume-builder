@@ -13,7 +13,12 @@ import { motion } from "framer-motion";
 import { TEMPLATES as templates, getTemplateComponent } from "@/lib/templates";
 import { cn } from "@/lib/utils";
 
-export default function FinalizePage() {
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+
+function FinalizeContent() {
+  const searchParams = useSearchParams();
+  const resumeId = searchParams.get("id");
   const { resumeData, updateSection, refreshData, loading: contextLoading } = useResume();
   const [dbTemplates, setDbTemplates] = useState<any[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
@@ -21,8 +26,8 @@ export default function FinalizePage() {
 
   useEffect(() => {
     fetchTemplates();
-    refreshData();
-  }, []);
+    refreshData(resumeId || undefined);
+  }, [resumeId]);
 
   const fetchTemplates = async () => {
     try {
@@ -47,7 +52,22 @@ export default function FinalizePage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
         section: "settings", 
-        data: { ...resumeData.settings, templateId } 
+        data: { ...resumeData.settings, templateId },
+        resumeId: resumeId
+      })
+    });
+  };
+
+  // Add automatic saving for inline edits
+  const handleUpdate = (section: any, data: any) => {
+    updateSection(section, data);
+    fetch("/api/resume/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        section, 
+        data,
+        resumeId: resumeId
       })
     });
   };
@@ -72,9 +92,10 @@ export default function FinalizePage() {
             </Button>
           </Link>
           <div className="w-px h-6 bg-slate-200" />
-          <h1 className="font-bold text-slate-900 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-indigo-600" />
-            Your Tailored CV
+          <h1 className="font-bold text-slate-900 flex items-center gap-2 text-sm sm:text-base whitespace-nowrap">
+            <Sparkles className="w-4 h-4 text-indigo-600 shrink-0" />
+            <span className="hidden sm:inline">Your Tailored CV</span>
+            <span className="sm:hidden">Resume</span>
           </h1>
         </div>
 
@@ -99,8 +120,8 @@ export default function FinalizePage() {
       </header>
 
       <main className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-[#f8fafc]">
-        {/* Left Sidebar: Template Selection */}
-        <aside className="w-full lg:w-[320px] bg-white border-r border-slate-200 overflow-y-auto shrink-0 flex flex-col">
+        {/* Left Sidebar: Template Selection - Now order-2 on mobile */}
+        <aside className="w-full lg:w-[320px] bg-white border-r border-slate-200 overflow-y-auto shrink-0 flex flex-col order-2 lg:order-1">
           <div className="p-8 border-b border-slate-100 bg-slate-50/50">
             <h3 className="text-xs font-black text-indigo-600 uppercase tracking-[0.2em] mb-1">
               Finalize
@@ -148,7 +169,7 @@ export default function FinalizePage() {
                       resumeData.settings?.color === color ? "border-indigo-600 scale-125 z-10 shadow-indigo-200" : "border-white hover:scale-110"
                     )}
                     style={{ backgroundColor: color }}
-                    onClick={() => updateSection("settings", { ...resumeData.settings, color })}
+                    onClick={() => handleUpdate("settings", { ...resumeData.settings, color })}
                   />
                 ))}
               </div>
@@ -176,7 +197,7 @@ export default function FinalizePage() {
                        <div className="absolute inset-0 origin-top-left scale-[0.04] w-[2500%] h-[2500%]">
                           {(() => {
                             const T = getTemplateComponent(id) as any;
-                            return <T data={resumeData as any} />;
+                            return <T data={resumeData as any} onUpdate={handleUpdate} />;
                           })()}
                        </div>
                     </div>
@@ -204,15 +225,15 @@ export default function FinalizePage() {
           </div>
         </aside>
 
-        {/* Center: Resume Preview */}
-        <section className="flex-1 overflow-y-auto p-4 md:p-12 flex flex-col items-center custom-scrollbar bg-slate-100/50">
+        {/* Center: Resume Preview - Now order-1 on mobile */}
+        <section className="flex-1 overflow-y-auto p-4 md:p-12 flex flex-col items-center custom-scrollbar bg-slate-100/50 order-1 lg:order-2">
           <div className="max-w-[850px] w-full">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="bg-white shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-sm overflow-hidden"
             >
-              <ResumePreview ref={resumeRef} />
+              <ResumePreview ref={resumeRef} onUpdate={handleUpdate} />
             </motion.div>
             
             {/* Pro-Tip */}
@@ -285,7 +306,7 @@ export default function FinalizePage() {
                         <div className="absolute inset-0 bg-white origin-top-left transform scale-[0.08] w-[1250%] h-[1250%] pointer-events-none transition-transform duration-500 group-hover:scale-[0.085]">
                            {(() => {
                              const T = getTemplateComponent(id) as any;
-                             return <T data={resumeData as any} />;
+                             return <T data={resumeData as any} onUpdate={handleUpdate} />;
                            })()}
                         </div>
                         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -315,5 +336,17 @@ export default function FinalizePage() {
         </section>
       </main>
     </div>
+  );
+}
+
+export default function FinalizePage() {
+  return (
+    <Suspense fallback={
+      <div className="h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+      </div>
+    }>
+      <FinalizeContent />
+    </Suspense>
   );
 }

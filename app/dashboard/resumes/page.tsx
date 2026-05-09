@@ -32,9 +32,7 @@ export default function ResumesPage() {
   }, []);
 
   const handleEdit = (id: string) => {
-    // For now, our builder only handles one resume at a time without an ID in the URL
-    // But we'll redirect to the builder
-    router.push("/builder");
+    router.push(`/dashboard/finalize?id=${id}`);
   };
 
   const handleCreateNew = () => {

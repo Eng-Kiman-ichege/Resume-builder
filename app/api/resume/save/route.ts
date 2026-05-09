@@ -9,10 +9,8 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { section, data } = await req.json();
+    const { section, data, resumeId } = await req.json();
 
-    // Update the resume record for this user
-    // Note: This assumes a single resume per user for simplicity
     const updateData: any = { 
       user_id: userId, 
       updated_at: new Date().toISOString()
@@ -25,16 +23,27 @@ export async function POST(req: Request) {
       updateData[section] = data;
     }
 
-    const { error } = await supabase
-      .from("resumes")
-      .upsert(updateData, { onConflict: 'user_id' });
+    let result;
+    if (resumeId) {
+      // Update specific resume
+      result = await supabase
+        .from("resumes")
+        .update(updateData)
+        .eq("id", resumeId)
+        .eq("user_id", userId);
+    } else {
+      // Create new resume (Auto-save behavior)
+      result = await supabase
+        .from("resumes")
+        .insert(updateData);
+    }
 
-    if (error) {
-      console.error("Supabase error:", error);
+    if (result.error) {
+      console.error("Supabase error:", result.error);
       return new NextResponse("Database Error", { status: 500 });
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, id: result.data?.[0]?.id });
   } catch (error) {
     console.error("API Error:", error);
     return new NextResponse("Internal Error", { status: 500 });
