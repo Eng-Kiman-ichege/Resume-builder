@@ -39,10 +39,27 @@ export const ModernClassic = ({
           />
         </div>
         <div className="text-right text-sm font-bold space-y-1 text-slate-500 uppercase tracking-wider max-w-[40%] shrink-0">
-          <div className="flex items-center justify-end gap-2 break-all"><AtSign className="h-3.5 w-3.5" style={{ color: accentColor }} /> {header.email}</div>
-          <div className="flex items-center justify-end gap-2 break-all"><Smartphone className="h-3.5 w-3.5" style={{ color: accentColor }} /> {header.phone}</div>
-          {header.profileLink && (<div className="flex items-center justify-end gap-2 break-all">{header.profileLabel || "Link"}:  {header.profileLink}</div>)}
-          <div className="flex items-center justify-end gap-2 break-all"><MapPin className="h-3.5 w-3.5" style={{ color: accentColor }} /> {header.city}</div>
+          <div className="flex items-center justify-end gap-2 break-all">
+            <AtSign className="h-3.5 w-3.5" style={{ color: accentColor }} /> 
+            <EditableText 
+              value={header.email || "email@example.com"} 
+              onUpdate={(val) => onUpdate?.("header", { ...header, email: val })}
+            />
+          </div>
+          <div className="flex items-center justify-end gap-2 break-all">
+            <Smartphone className="h-3.5 w-3.5" style={{ color: accentColor }} /> 
+            <EditableText 
+              value={header.phone || "Phone"} 
+              onUpdate={(val) => onUpdate?.("header", { ...header, phone: val })}
+            />
+          </div>
+          <div className="flex items-center justify-end gap-2 break-all">
+            <MapPin className="h-3.5 w-3.5" style={{ color: accentColor }} /> 
+            <EditableText 
+              value={header.city || "Location"} 
+              onUpdate={(val) => onUpdate?.("header", { ...header, city: val })}
+            />
+          </div>
         </div>
       </header>
 
@@ -69,12 +86,45 @@ export const ModernClassic = ({
                 style={{ backgroundColor: accentColor }}
               />
               <div className="flex justify-between items-baseline mb-1">
-                <h3 className="text-xl font-bold text-slate-900">{exp.jobTitle}</h3>
-                <span className="text-[11px] font-black text-slate-300 uppercase tracking-widest">
-                  {(exp.startYear || exp.startDate) || "Start"} — {(exp.endYear || exp.endDate) || "Present"}
-                </span>
+                <EditableText 
+                  value={exp.jobTitle || "Job Title"} 
+                  onUpdate={(val) => {
+                    const newExperience = [...experience];
+                    newExperience[i] = { ...newExperience[i], jobTitle: val };
+                    onUpdate?.("experience", newExperience);
+                  }}
+                  className="text-xl font-bold text-slate-900 leading-tight break-words pr-4"
+                />
+                <div className="text-[11px] font-black text-slate-300 uppercase tracking-widest flex gap-1">
+                  <EditableText 
+                    value={exp.startYear || "Start"} 
+                    onUpdate={(val) => {
+                      const newExperience = [...experience];
+                      newExperience[i] = { ...newExperience[i], startYear: val };
+                      onUpdate?.("experience", newExperience);
+                    }}
+                  />
+                  <span>—</span>
+                  <EditableText 
+                    value={exp.endYear || "Present"} 
+                    onUpdate={(val) => {
+                      const newExperience = [...experience];
+                      newExperience[i] = { ...newExperience[i], endYear: val };
+                      onUpdate?.("experience", newExperience);
+                    }}
+                  />
+                </div>
               </div>
-              <p className="text-sm font-black uppercase tracking-[0.1em] mb-4" style={{ color: accentColor }}>{exp.employer}</p>
+              <EditableText 
+                value={exp.employer || "Employer"} 
+                onUpdate={(val) => {
+                  const newExperience = [...experience];
+                  newExperience[i] = { ...newExperience[i], employer: val };
+                  onUpdate?.("experience", newExperience);
+                }}
+                className="text-sm font-black uppercase tracking-[0.1em] mb-4 block" 
+                style={{ color: accentColor }}
+              />
               <EditableText 
                 value={exp.description} 
                 onUpdate={(val) => {
@@ -90,23 +140,63 @@ export const ModernClassic = ({
         </div>
       </section>
 
+      {/* Skills */}
+      <section>
+        <h2 className="text-xs font-black uppercase tracking-[0.4em] text-slate-300 mb-4">Core Expertise</h2>
+        <EditableText 
+          value={skills.content} 
+          onUpdate={(val) => onUpdate?.("skills", { ...skills, content: val })}
+          className="text-[14px] text-slate-600 font-bold leading-relaxed p-2 bg-slate-50 rounded-xl border-dashed border-2 border-slate-100"
+          multiline
+        />
+      </section>
+
       {/* Education */}
       <section>
         <h2 className="text-xs font-black uppercase tracking-[0.4em] text-slate-300 mb-8">Education</h2>
         <div className="space-y-6">
           {education.map((edu, i) => (
             <div key={i} className="flex justify-between items-start">
-              <div>
-                <h4 className="text-lg font-bold text-slate-900">
-                  {edu.degree}{(edu.field || edu.fieldOfStudy) ? " in " + (edu.field || edu.fieldOfStudy) : ""}
-                </h4>
-                <p className="text-sm font-bold uppercase tracking-widest" style={{ color: accentColor }}>
-                  {edu.institution || edu.schoolName}
-                </p>
+              <div className="flex-1">
+                <EditableText 
+                  value={edu.degree || "Degree"} 
+                  onUpdate={(val) => {
+                    const newEdu = [...education];
+                    newEdu[i] = { ...newEdu[i], degree: val };
+                    onUpdate?.("education", newEdu);
+                  }}
+                  className="text-lg font-bold text-slate-900 leading-tight break-words"
+                />
+                <EditableText 
+                  value={edu.institution || "Institution"} 
+                  onUpdate={(val) => {
+                    const newEdu = [...education];
+                    newEdu[i] = { ...newEdu[i], institution: val };
+                    onUpdate?.("education", newEdu);
+                  }}
+                  className="text-sm font-bold uppercase tracking-widest block" 
+                  style={{ color: accentColor }}
+                />
               </div>
-              <span className="text-[11px] font-black text-slate-300 uppercase">
-                {edu.startYear || ""} {edu.startYear && (edu.endYear || edu.gradYear) ? "—" : ""} {edu.endYear || edu.gradYear}
-              </span>
+              <div className="text-[11px] font-black text-slate-300 uppercase flex gap-1">
+                <EditableText 
+                  value={edu.startYear || "Year"} 
+                  onUpdate={(val) => {
+                    const newEdu = [...education];
+                    newEdu[i] = { ...newEdu[i], startYear: val };
+                    onUpdate?.("education", newEdu);
+                  }}
+                />
+                <span>—</span>
+                <EditableText 
+                  value={edu.endYear || "Year"} 
+                  onUpdate={(val) => {
+                    const newEdu = [...education];
+                    newEdu[i] = { ...newEdu[i], endYear: val };
+                    onUpdate?.("education", newEdu);
+                  }}
+                />
+              </div>
             </div>
           ))}
         </div>

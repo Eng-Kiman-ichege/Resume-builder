@@ -23,13 +23,38 @@ import { Seattle } from "./Seattle";
 import { ResumeData } from "@/lib/context/ResumeContext";
 
 export const TEMPLATES = {
+  // Core Collection
   "modern-classic": ModernClassic,
   "blue-executive": BlueExecutive,
   "minimalist": Minimalist,
+  "seattle": Seattle,
   "london": London,
   "paris": Paris,
   "tokyo": Tokyo,
   "new-york": NewYork,
+  
+  // Executive Series
+  "executive-gold": BlueExecutive,
+  "corporate-pro": London,
+  "director-slate": ModernClassic,
+  "ceo-premium": NewYork,
+  "board-member": Paris,
+  
+  // Creative Series
+  "creative-neon": Seattle,
+  "design-studio": Tokyo,
+  "portfolio-bold": NewYork,
+  "art-director": Berlin,
+  "agency-pro": Sydney,
+  
+  // Minimal Series
+  "clean-canvas": Minimalist,
+  "simple-light": London,
+  "pure-white": Paris,
+  "minimal-plus": Toronto,
+  "zen-resume": Seoul,
+  
+  // Professional Cities
   "berlin": Berlin,
   "sydney": Sydney,
   "toronto": Toronto,
@@ -42,7 +67,30 @@ export const TEMPLATES = {
   "stockholm": Stockholm,
   "madrid": Madrid,
   "austin": Austin,
-  "seattle": Seattle,
+  
+  // Specialized
+  "tech-innovator": Seattle,
+  "sales-master": BlueExecutive,
+  "marketing-hero": Tokyo,
+  "legal-advisor": London,
+  "medical-pro": Toronto,
+  "finance-elite": ModernClassic,
+  "academic-bright": NewYork,
+  "non-profit": Barcelona,
+  "startup-vibe": Austin,
+  "freelance-flow": Madrid,
+  
+  // Global Edition
+  "dubai": BlueExecutive,
+  "hong-kong": Tokyo,
+  "shanghai": London,
+  "london-dark": London,
+  "paris-nights": Paris,
+  "tokyo-drift": Tokyo,
+  "ny-loft": NewYork,
+  "sf-tech": Seattle,
+  "austin-sun": Austin,
+  "miami-vice": Seattle,
 } as const;
 
 export const colors = [

@@ -42,10 +42,32 @@ export const Seattle = ({
          </div>
          
          <div className="text-right text-[11px] font-black uppercase tracking-widest space-y-3 opacity-60 relative z-10 max-w-[40%] shrink-0 break-all">
-            <div>{header.email}</div>
-            <div>{header.phone}</div>
-            {header.profileLink && (<div>{header.profileLink}</div>)}
-            <div>{header.city}</div>
+            <div>
+               <EditableText 
+                 value={header.email || "Email"} 
+                 onUpdate={(val) => onUpdate?.("header", { ...header, email: val })}
+               />
+            </div>
+            <div>
+               <EditableText 
+                 value={header.phone || "Phone"} 
+                 onUpdate={(val) => onUpdate?.("header", { ...header, phone: val })}
+               />
+            </div>
+            {header.profileLink && (
+              <div>
+                 <EditableText 
+                   value={header.profileLink} 
+                   onUpdate={(val) => onUpdate?.("header", { ...header, profileLink: val })}
+                 />
+              </div>
+            )}
+            <div>
+               <EditableText 
+                 value={header.city || "City"} 
+                 onUpdate={(val) => onUpdate?.("header", { ...header, city: val })}
+               />
+            </div>
          </div>
       </header>
 
@@ -54,16 +76,12 @@ export const Seattle = ({
             <section>
                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-slate-300 mb-6">Expertise</h2>
                <div className="space-y-4">
-                  {(skills?.content || "").split(",").filter(Boolean).map((skill, i) => (
-                    <div key={i} className="space-y-2">
-                       <div className="flex justify-between text-[10px] font-black uppercase">
-                          <span>{skill.trim()}</span>
-                       </div>
-                       <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
-                          <div className="h-full rounded-full" style={{ width: `${60 + Math.random() * 40}%`, backgroundColor: accentColor }} />
-                       </div>
-                    </div>
-                  ))}
+                  <EditableText 
+                    value={skills.content} 
+                    onUpdate={(val) => onUpdate?.("skills", { ...skills, content: val })}
+                    className="text-sm font-bold text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl border-dashed border border-slate-200"
+                    multiline
+                  />
                </div>
             </section>
 
@@ -72,13 +90,43 @@ export const Seattle = ({
                <div className="space-y-6">
                   {education.map((edu, i) => (
                     <div key={i}>
-                       <h4 className="text-base font-black text-slate-900">
-                         {edu.degree}{(edu.field || edu.fieldOfStudy) ? " in " + (edu.field || edu.fieldOfStudy) : ""}
-                       </h4>
-                       <p className="text-xs font-bold text-slate-400 mt-1">{edu.institution || edu.schoolName}</p>
-                       <p className="text-[10px] font-black mt-2 opacity-30">
-                         {edu.startYear || ""} {edu.startYear && (edu.endYear || edu.gradYear) ? "—" : ""} {edu.endYear || edu.gradYear}
-                       </p>
+                       <EditableText 
+                         value={edu.degree || "Degree"} 
+                         onUpdate={(val) => {
+                           const newEdu = [...education];
+                           newEdu[i] = { ...newEdu[i], degree: val };
+                           onUpdate?.("education", newEdu);
+                         }}
+                         className="text-base font-black text-slate-900 leading-tight break-words pr-4"
+                       />
+                       <EditableText 
+                         value={edu.institution || "Institution"} 
+                         onUpdate={(val) => {
+                           const newEdu = [...education];
+                           newEdu[i] = { ...newEdu[i], institution: val };
+                           onUpdate?.("education", newEdu);
+                         }}
+                         className="text-xs font-bold text-slate-400 mt-1 block"
+                       />
+                       <div className="text-[10px] font-black mt-2 opacity-30 flex gap-1">
+                         <EditableText 
+                           value={edu.startYear || "Year"} 
+                           onUpdate={(val) => {
+                             const newEdu = [...education];
+                             newEdu[i] = { ...newEdu[i], startYear: val };
+                             onUpdate?.("education", newEdu);
+                           }}
+                         />
+                         <span>—</span>
+                         <EditableText 
+                           value={edu.endYear || "Year"} 
+                           onUpdate={(val) => {
+                             const newEdu = [...education];
+                             newEdu[i] = { ...newEdu[i], endYear: val };
+                             onUpdate?.("education", newEdu);
+                           }}
+                         />
+                       </div>
                     </div>
                   ))}
                </div>
@@ -101,12 +149,44 @@ export const Seattle = ({
                   {experience.map((exp, i) => (
                     <div key={i} className="group border-l-4 pl-8 transition-colors" style={{ borderColor: i === 0 ? accentColor : '#f1f5f9' }}>
                        <div className="flex justify-between items-baseline mb-2">
-                          <h3 className="text-2xl font-black text-slate-900 leading-none">{exp.jobTitle}</h3>
-                          <span className="text-xs font-black text-slate-200 uppercase tracking-widest">
-                            {(exp.startYear || exp.startDate) || "Start"} — {(exp.endYear || exp.endDate) || "Present"}
-                          </span>
+                          <EditableText 
+                            value={exp.jobTitle || "Job Title"} 
+                            onUpdate={(val) => {
+                              const newExperience = [...experience];
+                              newExperience[i] = { ...newExperience[i], jobTitle: val };
+                              onUpdate?.("experience", newExperience);
+                            }}
+                            className="text-2xl font-black text-slate-900 leading-tight break-words pr-4"
+                          />
+                          <div className="text-xs font-black text-slate-200 uppercase tracking-widest flex gap-1">
+                             <EditableText 
+                               value={exp.startYear || "Start"} 
+                               onUpdate={(val) => {
+                                 const newExperience = [...experience];
+                                 newExperience[i] = { ...newExperience[i], startYear: val };
+                                 onUpdate?.("experience", newExperience);
+                               }}
+                             />
+                             <span>—</span>
+                             <EditableText 
+                               value={exp.endYear || "Present"} 
+                               onUpdate={(val) => {
+                                 const newExperience = [...experience];
+                                 newExperience[i] = { ...newExperience[i], endYear: val };
+                                 onUpdate?.("experience", newExperience);
+                               }}
+                             />
+                          </div>
                        </div>
-                       <p className="text-sm font-black uppercase tracking-widest mb-4 opacity-40">{exp.employer}</p>
+                       <EditableText 
+                         value={exp.employer || "Employer"} 
+                         onUpdate={(val) => {
+                           const newExperience = [...experience];
+                           newExperience[i] = { ...newExperience[i], employer: val };
+                           onUpdate?.("experience", newExperience);
+                         }}
+                         className="text-sm font-black uppercase tracking-widest mb-4 opacity-40 block"
+                       />
                        <EditableText 
                          value={exp.description} 
                          onUpdate={(val) => {
