@@ -14,6 +14,15 @@ export async function POST(req: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = new Uint8Array(bytes);
 
+    // Global shims for Node.js environment
+    if (typeof globalThis.DOMMatrix === "undefined") {
+      (globalThis as any).DOMMatrix = class DOMMatrix {
+        constructor(init: any) {
+          // Minimal shim for PDF.js text extraction
+        }
+      };
+    }
+
     // Use pdfjs-dist legacy build for server-side compatibility
     const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
     
