@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useResume, ResumeContext } from "@/lib/context/ResumeContext";
+import { useResume, ResumeContext, type ResumeData } from "@/lib/context/ResumeContext";
 import { useContext } from "react";
 import { Sparkles, Loader2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
