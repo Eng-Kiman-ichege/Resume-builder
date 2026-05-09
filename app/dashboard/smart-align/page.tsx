@@ -38,8 +38,11 @@ export default function SmartAlignPage() {
       // 🚀 Client-side extraction using pdfjs-dist
       const pdfjs = await import("pdfjs-dist");
       
-      // Use the CDN-hosted worker for maximum reliability in the browser
-      pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+      // Use the local worker from node_modules (Bundled by Next.js)
+      pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+        "pdfjs-dist/build/pdf.worker.min.mjs",
+        import.meta.url
+      ).toString();
 
       const arrayBuffer = await selectedFile.arrayBuffer();
       const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
