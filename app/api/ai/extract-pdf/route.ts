@@ -12,43 +12,30 @@ export async function POST(req: Request) {
     }
 
     const bytes = await file.arrayBuffer();
-    const buffer = new Uint8Array(bytes);
+    const buffer = Buffer.from(bytes);
 
-    // Global shims for Node.js environment
+    // 🛡️ COMPREHENSIVE NODE.JS SHIMS
+    // These prevent PDF.js from crashing when it looks for browser APIs
     if (typeof globalThis.DOMMatrix === "undefined") {
       (globalThis as any).DOMMatrix = class DOMMatrix {
-        constructor(init: any) {
-          // Minimal shim for PDF.js text extraction
-        }
+        constructor() {}
+        static fromFloat32Array() { return new DOMMatrix(); }
+        static fromFloat64Array() { return new DOMMatrix(); }
       };
     }
-
-    // Use pdfjs-dist legacy build for server-side compatibility
-    const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-    const pdfjsWorker = await import("pdfjs-dist/legacy/build/pdf.worker.mjs");
     
-    // Manually configure the worker
-    (pdfjs as any).GlobalWorkerOptions.workerSrc = pdfjsWorker;
-    
-    const loadingTask = (pdfjs as any).getDocument({
-      data: buffer,
-      useSystemFonts: true,
-      disableFontFace: true,
-    });
-    
-    const pdf = await loadingTask.promise;
-    let fullText = "";
-
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const textContent = await page.getTextContent();
-      const pageText = textContent.items
-        .map((item: any) => item.str)
-        .join(" ");
-      fullText += pageText + "\n";
+    // Some versions of PDF.js check for Image or document
+    if (typeof globalThis.Image === "undefined") {
+      (globalThis as any).Image = class {};
     }
 
-    return NextResponse.json({ text: fullText.trim() });
+    // 🛠️ Use pdf-parse v2 (Named Export)
+    const { PDFParse } = await import("pdf-parse");
+    const parser = new (PDFParse as any)({ data: buffer });
+    const result = await parser.getText();
+    await parser.destroy();
+
+    return NextResponse.json({ text: result.text });
   } catch (error: any) {
     console.error("PDF Extraction Error:", error);
     return NextResponse.json(

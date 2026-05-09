@@ -35,23 +35,34 @@ export default function SmartAlignPage() {
     setError("");
 
     try {
-      const formData = new FormData();
-      formData.append("file", selectedFile);
+      // 🚀 Client-side extraction using pdfjs-dist
+      const pdfjs = await import("pdfjs-dist");
+      
+      // Use the CDN-hosted worker for maximum reliability in the browser
+      pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
-      const response = await fetch("/api/ai/extract-pdf", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to extract text from PDF");
+      const arrayBuffer = await selectedFile.arrayBuffer();
+      const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
+      const pdf = await loadingTask.promise;
+      
+      let fullText = "";
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items
+          .map((item: any) => item.str)
+          .join(" ");
+        fullText += pageText + "\n";
       }
 
-      const data = await response.json();
-      setCvText(data.text);
+      if (!fullText.trim()) {
+        throw new Error("No text found in PDF");
+      }
+
+      setCvText(fullText.trim());
     } catch (err: any) {
-      console.error(err);
-      setError("Could not read the PDF. Please try pasting the text manually.");
+      console.error("Client-side Extraction Error:", err);
+      setError("Could not read the PDF automatically. Please try pasting the text manually.");
     } finally {
       setIsExtracting(false);
     }
