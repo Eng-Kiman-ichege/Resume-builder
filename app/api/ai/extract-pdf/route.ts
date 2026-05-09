@@ -12,19 +12,34 @@ export async function POST(req: Request) {
     }
 
     const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const buffer = new Uint8Array(bytes);
 
-    // pdf-parse v2 — uses a named PDFParse class, not a default function
-    const { PDFParse } = await import("pdf-parse");
-    const parser = new PDFParse({ data: buffer });
-    const result = await parser.getText();
-    await parser.destroy();
+    // Use pdfjs-dist legacy build for server-side compatibility
+    const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+    
+    const loadingTask = pdfjs.getDocument({
+      data: buffer,
+      useSystemFonts: true,
+      disableFontFace: true, // Speeds up text extraction
+    });
+    
+    const pdf = await loadingTask.promise;
+    let fullText = "";
 
-    return NextResponse.json({ text: result.text });
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items
+        .map((item: any) => item.str)
+        .join(" ");
+      fullText += pageText + "\n";
+    }
+
+    return NextResponse.json({ text: fullText.trim() });
   } catch (error: any) {
     console.error("PDF Extraction Error:", error);
     return NextResponse.json(
-      { error: "Failed to extract text from PDF" },
+      { error: "Failed to extract text from PDF: " + error.message },
       { status: 500 }
     );
   }
