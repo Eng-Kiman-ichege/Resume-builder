@@ -2,7 +2,15 @@
 
 import { ResumeData } from "@/lib/context/ResumeContext";
 
-export const Seattle = ({ data }: { data: ResumeData }) => {
+import { EditableText } from "@/components/EditableText";
+
+export const Seattle = ({ 
+  data, 
+  onUpdate 
+}: { 
+  data: ResumeData, 
+  onUpdate?: (section: any, value: any) => void 
+}) => {
   const { header, summary, experience, education, skills, settings } = data;
   const accentColor = settings?.color || "#0369a1";
 
@@ -13,11 +21,24 @@ export const Seattle = ({ data }: { data: ResumeData }) => {
          <div className="absolute right-[-50px] top-[-50px] w-64 h-64 rounded-full opacity-10" style={{ backgroundColor: accentColor }} />
          
          <div className="relative z-10">
-            <h1 className="text-6xl font-black tracking-tighter uppercase leading-none mb-4">
-               {header.firstName}<br />
-               <span style={{ color: accentColor }}>{header.surname}</span>
+            <h1 className="text-6xl font-black tracking-tighter uppercase leading-none mb-4 flex flex-col">
+               <EditableText 
+                 value={header.firstName || "First"} 
+                 onUpdate={(val) => onUpdate?.("header", { ...header, firstName: val })}
+                 className="hover:bg-white/10"
+               />
+               <EditableText 
+                 value={header.surname || "Surname"} 
+                 onUpdate={(val) => onUpdate?.("header", { ...header, surname: val })}
+                 style={{ color: accentColor }}
+                 className="hover:bg-white/10"
+               />
             </h1>
-            <p className="text-xl font-bold uppercase tracking-[0.4em] opacity-40">{header.jobTitle}</p>
+            <EditableText 
+              value={header.jobTitle || "Professional Title"} 
+              onUpdate={(val) => onUpdate?.("header", { ...header, jobTitle: val })}
+              className="text-xl font-bold uppercase tracking-[0.4em] opacity-40 hover:bg-white/10"
+            />
          </div>
          
          <div className="text-right text-[11px] font-black uppercase tracking-widest space-y-3 opacity-60 relative z-10">
@@ -51,9 +72,13 @@ export const Seattle = ({ data }: { data: ResumeData }) => {
                <div className="space-y-6">
                   {education.map((edu, i) => (
                     <div key={i}>
-                       <h4 className="text-base font-black text-slate-900">{edu.degree}{edu.field ? " in " + edu.field : ""}</h4>
-                       <p className="text-xs font-bold text-slate-400 mt-1">{edu.institution}</p>
-                       <p className="text-[10px] font-black mt-2 opacity-30">{edu.startYear} — {edu.endYear}</p>
+                       <h4 className="text-base font-black text-slate-900">
+                         {edu.degree}{(edu.field || edu.fieldOfStudy) ? " in " + (edu.field || edu.fieldOfStudy) : ""}
+                       </h4>
+                       <p className="text-xs font-bold text-slate-400 mt-1">{edu.institution || edu.schoolName}</p>
+                       <p className="text-[10px] font-black mt-2 opacity-30">
+                         {edu.startYear || ""} {edu.startYear && (edu.endYear || edu.gradYear) ? "—" : ""} {edu.endYear || edu.gradYear}
+                       </p>
                     </div>
                   ))}
                </div>
@@ -62,9 +87,12 @@ export const Seattle = ({ data }: { data: ResumeData }) => {
 
          <div className="col-span-8 space-y-12">
             <section>
-               <p className="text-lg leading-relaxed text-slate-600 font-medium bg-slate-50 p-8 rounded-3xl border border-slate-100 italic">
-                  {summary.content}
-               </p>
+               <EditableText 
+                 value={summary.content} 
+                 onUpdate={(val) => onUpdate?.("summary", { ...summary, content: val })}
+                 className="text-lg leading-relaxed text-slate-600 font-medium bg-slate-50 p-8 rounded-3xl border border-slate-100 italic"
+                 multiline
+               />
             </section>
 
             <section>
@@ -74,10 +102,21 @@ export const Seattle = ({ data }: { data: ResumeData }) => {
                     <div key={i} className="group border-l-4 pl-8 transition-colors" style={{ borderColor: i === 0 ? accentColor : '#f1f5f9' }}>
                        <div className="flex justify-between items-baseline mb-2">
                           <h3 className="text-2xl font-black text-slate-900 leading-none">{exp.jobTitle}</h3>
-                          <span className="text-xs font-black text-slate-200 uppercase">{exp.startYear} — {exp.endYear}</span>
+                          <span className="text-xs font-black text-slate-200 uppercase tracking-widest">
+                            {(exp.startYear || exp.startDate) || "Start"} — {(exp.endYear || exp.endDate) || "Present"}
+                          </span>
                        </div>
                        <p className="text-sm font-black uppercase tracking-widest mb-4 opacity-40">{exp.employer}</p>
-                       <p className="text-base text-slate-500 font-medium leading-relaxed">{exp.description}</p>
+                       <EditableText 
+                         value={exp.description} 
+                         onUpdate={(val) => {
+                           const newExperience = [...experience];
+                           newExperience[i] = { ...newExperience[i], description: val };
+                           onUpdate?.("experience", newExperience);
+                         }}
+                         className="text-base text-slate-500 font-medium leading-relaxed p-1"
+                         multiline
+                       />
                     </div>
                   ))}
                </div>

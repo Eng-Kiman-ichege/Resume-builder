@@ -15,12 +15,27 @@ export async function GET(request: Request) {
       .eq("user_id", userId)
       .single();
 
-    if (error && error.code !== "PGRST116") { // PGRST116 is "No rows found"
-      return new NextResponse(error.message, { status: 500 });
+    if (data) {
+      // Map database columns back to the frontend ResumeData structure
+      const formattedData = {
+        ...data,
+        settings: data.colors || {
+          templateId: data.template_id || 'modern-classic',
+          color: "#3b82f6",
+          titleColor: "#0f172a",
+          backgroundColor: "#ffffff",
+        }
+      };
+      // Ensure templateId is correctly set if colors doesn't have it
+      if (formattedData.settings && !formattedData.settings.templateId) {
+        formattedData.settings.templateId = data.template_id || 'modern-classic';
+      }
+      return NextResponse.json(formattedData);
     }
 
-    return NextResponse.json(data || null);
+    return NextResponse.json(null);
   } catch (error: any) {
+    console.error("GET Resume Error:", error);
     return new NextResponse(error.message, { status: 500 });
   }
 }

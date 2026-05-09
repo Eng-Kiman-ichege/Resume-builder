@@ -149,11 +149,18 @@ export default function ReviewPage() {
     <div className="flex flex-col h-screen w-full bg-[#1a2b4b] text-white overflow-hidden">
       {/* Header */}
       <header className="h-16 border-b border-white/10 flex items-center justify-between px-6 shrink-0">
-        <div className="flex items-center gap-2">
-          <div className="bg-white text-[#1a2b4b] p-1 rounded-sm">
-            <Layout className="h-5 w-5" />
+        <div className="flex items-center gap-6">
+          <Link href="/dashboard" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+            <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+            <span className="text-sm font-medium">Dashboard</span>
+          </Link>
+          <div className="w-px h-6 bg-white/10" />
+          <div className="flex items-center gap-2">
+            <div className="bg-white text-[#1a2b4b] p-1 rounded-sm">
+              <Layout className="h-5 w-5" />
+            </div>
+            <span className="font-bold text-xl tracking-tight italic">Resume Now.</span>
           </div>
-          <span className="font-bold text-xl tracking-tight italic">Resume Now.</span>
         </div>
 
         <div className="flex items-center gap-4">

@@ -26,6 +26,8 @@ export const metadata: Metadata = {
   description: "Create stunning, ATS-friendly resumes and tailored cover letters in minutes with CV Craft.",
 };
 
+import { ResumeProvider } from "@/lib/context/ResumeContext";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -38,7 +40,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       >
         <body className="min-h-full flex flex-col bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50">
-          <TooltipProvider>{children}</TooltipProvider>
+          <TooltipProvider>
+            <ResumeProvider>
+              {children}
+            </ResumeProvider>
+          </TooltipProvider>
         </body>
       </html>
     </ClerkProvider>

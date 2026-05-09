@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { FileText, Mail, Plus, UserCircle } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 
@@ -29,6 +30,15 @@ export default function DashboardLayout({
     <div className="flex flex-col md:flex-row h-screen bg-white">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-24 border-r border-slate-200 flex-col items-center py-8 gap-10 bg-slate-50">
+        <Link href="/dashboard" className="mb-2">
+          <Image 
+            src="/logo.png" 
+            alt="CV Craft Logo" 
+            width={48} 
+            height={48} 
+            className="rounded-xl shadow-sm hover:scale-105 transition-transform"
+          />
+        </Link>
         <div className="flex flex-col items-center gap-8 w-full">
           {navItems.map((item) => {
             const isActive = pathname === item.href;

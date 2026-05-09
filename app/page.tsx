@@ -44,12 +44,16 @@ export default function Home() {
       {/* Navigation */}
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-3 sm:gap-4">
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <div className="bg-primary text-primary-foreground p-1.5 rounded-lg">
-              <FileText className="h-4 sm:h-5 w-4 sm:w-5" />
-            </div>
+          <Link href="/" className="flex items-center gap-2 flex-shrink-0 group">
+            <Image 
+              src="/logo.png" 
+              alt="CV Craft Logo" 
+              width={32} 
+              height={32} 
+              className="rounded-lg shadow-sm group-hover:scale-105 transition-transform"
+            />
             <span className="font-bold text-lg sm:text-xl tracking-tight">CV Craft</span>
-          </div>
+          </Link>
           <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-sm font-medium">
             <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">Features</Link>
             <Link href="#templates" className="text-muted-foreground hover:text-foreground transition-colors">Templates</Link>
@@ -221,9 +225,13 @@ export default function Home() {
         <div className="container mx-auto px-3 sm:px-4 flex flex-col gap-4 sm:gap-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="bg-primary text-primary-foreground p-1 rounded-md">
-                <FileText className="h-4 w-4" />
-              </div>
+              <Image 
+                src="/logo.png" 
+                alt="CV Craft Logo" 
+                width={24} 
+                height={24} 
+                className="rounded-md shadow-sm"
+              />
               <span className="font-bold text-base sm:text-lg tracking-tight">CV Craft</span>
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 text-xs sm:text-sm text-muted-foreground">

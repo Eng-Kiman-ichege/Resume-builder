@@ -20,15 +20,19 @@ export const ResumePreview = forwardRef(({
   liveEducation,
   customTemplateId,
   data: propData,
+  manualScale,
+  onUpdate,
 }: {
   liveExperience?: any;
   liveEducation?: any;
   customTemplateId?: string;
   data?: any;
+  manualScale?: number;
+  onUpdate?: (section: any, value: any) => void;
 }, ref) => {
   const context = useContext(ResumeContext);
   const resumeData = propData || context?.resumeData;
-  const settings = resumeData.settings || { templateId: "modern-classic" };
+  const settings = resumeData?.settings || { templateId: "modern-classic" };
   const activeTemplateId = (
     customTemplateId ||
     settings.templateId ||
@@ -36,9 +40,10 @@ export const ResumePreview = forwardRef(({
   ).toLowerCase();
 
   const pathname = usePathname();
-  const showDownloadButton = pathname === "/builder/finalize";
+  const isFinalizePage = pathname === "/dashboard/finalize" || pathname === "/builder/review";
+  const showDownloadButton = isFinalizePage && !customTemplateId;
 
-  const [scale, setScale] = useState(0.5);
+  const [scale, setScale] = useState(manualScale || 0.5);
   const [exporting, setExporting] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -46,6 +51,10 @@ export const ResumePreview = forwardRef(({
 
   // Compute scale so the full A4 width fits the available container width
   useEffect(() => {
+    if (manualScale) {
+      setScale(manualScale);
+      return;
+    }
     const updateScale = () => {
       if (!containerRef.current) return;
       const availableW = containerRef.current.clientWidth - 32; // 16px padding each side
@@ -55,7 +64,7 @@ export const ResumePreview = forwardRef(({
     const ro = new ResizeObserver(updateScale);
     if (containerRef.current) ro.observe(containerRef.current);
     return () => ro.disconnect();
-  }, []);
+  }, [manualScale]);
 
   const handleDownload = async (action: "download" | "print" | "email" = "download") => {
     if (!resumeRef.current) return;
@@ -126,6 +135,19 @@ export const ResumePreview = forwardRef(({
 
   const TemplateComponent = getTemplateComponent(activeTemplateId);
 
+  const handleLiveUpdate = (section: keyof ResumeData, value: any) => {
+    if (context?.updateSection) {
+      context.updateSection(section, value);
+      
+      // Save to DB
+      fetch("/api/resume/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ section, data: value })
+      });
+    }
+  };
+
   const currentData = {
     ...resumeData,
     experience: liveExperience
@@ -171,9 +193,7 @@ export const ResumePreview = forwardRef(({
         </div>
       )}
 
-      {/* ── Stage ──
-          The outer div collapses to the *visual* (scaled) size so the layout
-          never overflows. The inner div is full A4 and gets CSS-scaled down. */}
+      {/* ── Stage ── */}
       <div
         className="flex-shrink-0 relative shadow-2xl"
         style={{ width: scaledW, height: scaledH }}
@@ -188,7 +208,10 @@ export const ResumePreview = forwardRef(({
           }}
           className="bg-white"
         >
-          <TemplateComponent data={currentData} />
+          <TemplateComponent 
+            data={currentData} 
+            onUpdate={handleLiveUpdate}
+          />
         </div>
       </div>
 

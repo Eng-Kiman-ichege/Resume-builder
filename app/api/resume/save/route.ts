@@ -12,17 +12,22 @@ export async function POST(req: Request) {
     const { section, data } = await req.json();
 
     // Update the resume record for this user
-    // Note: This assumes a single resume per user for simplicity, or we'd need a resumeId
+    // Note: This assumes a single resume per user for simplicity
+    const updateData: any = { 
+      user_id: userId, 
+      updated_at: new Date().toISOString()
+    };
+
+    if (section === "settings") {
+      updateData.template_id = data.templateId;
+      updateData.colors = data;
+    } else {
+      updateData[section] = data;
+    }
+
     const { error } = await supabase
       .from("resumes")
-      .upsert(
-        { 
-          user_id: userId, 
-          [section]: data,
-          updated_at: new Date().toISOString()
-        },
-        { onConflict: 'user_id' }
-      );
+      .upsert(updateData, { onConflict: 'user_id' });
 
     if (error) {
       console.error("Supabase error:", error);
