@@ -20,28 +20,28 @@ export const Seattle = ({
          {/* Decorative circle */}
          <div className="absolute right-[-50px] top-[-50px] w-64 h-64 rounded-full opacity-10" style={{ backgroundColor: accentColor }} />
          
-         <div className="relative z-10">
+         <div className="relative z-10 flex-1 min-w-0 mr-8">
             <h1 className="text-6xl font-black tracking-tighter uppercase leading-none mb-4 flex flex-col">
                <EditableText 
                  value={header.firstName || "First"} 
                  onUpdate={(val) => onUpdate?.("header", { ...header, firstName: val })}
-                 className="hover:bg-white/10"
+                 className="hover:bg-white/10 break-words"
                />
                <EditableText 
                  value={header.surname || "Surname"} 
                  onUpdate={(val) => onUpdate?.("header", { ...header, surname: val })}
                  style={{ color: accentColor }}
-                 className="hover:bg-white/10"
+                 className="hover:bg-white/10 break-words"
                />
             </h1>
             <EditableText 
               value={header.jobTitle || "Professional Title"} 
               onUpdate={(val) => onUpdate?.("header", { ...header, jobTitle: val })}
-              className="text-xl font-bold uppercase tracking-[0.4em] opacity-40 hover:bg-white/10"
+              className="text-xl font-bold uppercase tracking-[0.4em] opacity-40 hover:bg-white/10 break-words"
             />
          </div>
          
-         <div className="text-right text-[11px] font-black uppercase tracking-widest space-y-3 opacity-60 relative z-10">
+         <div className="text-right text-[11px] font-black uppercase tracking-widest space-y-3 opacity-60 relative z-10 max-w-[40%] shrink-0 break-all">
             <div>{header.email}</div>
             <div>{header.phone}</div>
             {header.profileLink && (<div>{header.profileLink}</div>)}

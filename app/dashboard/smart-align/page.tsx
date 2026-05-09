@@ -273,30 +273,30 @@ export default function SmartAlignPage() {
                 )}
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 flex flex-col">
+            <CardContent className="flex-1 flex flex-col p-0">
               <Textarea 
                 placeholder="Pasted text will appear here after upload, or you can paste it manually..." 
-                className="flex-1 min-h-[300px] resize-none focus-visible:ring-indigo-500"
+                className="h-[300px] resize-none border-none focus-visible:ring-0 p-6 rounded-none bg-transparent"
                 value={cvText}
                 onChange={(e) => setCvText(e.target.value)}
               />
             </CardContent>
           </Card>
 
-          <Card className="border-slate-200 shadow-sm flex flex-col">
+          <Card className="border-slate-200 shadow-sm flex flex-col overflow-hidden">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-slate-900">
                 <Briefcase className="w-5 h-5 text-indigo-600" />
                 Job Description
               </CardTitle>
               <CardDescription>
-                Paste the requirements and description of the job you're targeting.
+                Paste the requirements and description of the target job.
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 flex flex-col">
+            <CardContent className="flex-1 flex flex-col p-0 border-t border-slate-100">
               <Textarea 
                 placeholder="Paste the target job description here..." 
-                className="flex-1 min-h-[300px] resize-none focus-visible:ring-indigo-500"
+                className="h-[300px] resize-none border-none focus-visible:ring-0 p-6 rounded-none bg-transparent"
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
               />

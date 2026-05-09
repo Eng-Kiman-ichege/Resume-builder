@@ -18,32 +18,32 @@ export const BlueExecutive = ({
     <div className="bg-white w-full h-full flex flex-col font-serif text-slate-900">
       {/* Top Banner */}
       <header className="text-white p-12 text-center flex flex-col items-center" style={{ backgroundColor: accentColor }}>
-        <h1 className="text-5xl font-bold tracking-tight mb-2 uppercase flex gap-4">
+        <h1 className="text-5xl font-bold tracking-tight mb-2 uppercase flex flex-wrap justify-center gap-4 px-8">
           <EditableText 
             value={header.firstName || "First"} 
             onUpdate={(val) => onUpdate?.("header", { ...header, firstName: val })}
-            className="hover:bg-white/10"
+            className="hover:bg-white/10 break-words"
           />
           <EditableText 
             value={header.surname || "Surname"} 
             onUpdate={(val) => onUpdate?.("header", { ...header, surname: val })}
-            className="hover:bg-white/10"
+            className="hover:bg-white/10 break-words"
           />
         </h1>
         <div className="w-20 h-1 bg-white/30 rounded-full mb-6" />
         <EditableText 
           value={header.jobTitle || "Professional Title"} 
           onUpdate={(val) => onUpdate?.("header", { ...header, jobTitle: val })}
-          className="text-lg tracking-[0.4em] opacity-80 font-medium uppercase italic px-4 py-1"
+          className="text-lg tracking-[0.4em] opacity-80 font-medium uppercase italic px-4 py-1 break-words max-w-2xl"
         />
       </header>
       
       {/* Floating Contact Bar ... */}
-      <div className="bg-slate-900 text-white py-3 flex justify-center gap-10 text-[10px] font-black uppercase tracking-[0.2em]">
-         <div className="flex items-center gap-2"><AtSign className="h-3 w-3" style={{ color: accentColor }} /> {header.email}</div>
-         <div className="flex items-center gap-2"><Smartphone className="h-3 w-3" style={{ color: accentColor }} /> {header.phone}</div>
-         {header.profileLink && (<div className="flex items-center gap-2">{header.profileLabel || "Link"}:  {header.profileLink}</div>)}
-         <div className="flex items-center gap-2"><MapPin className="h-3 w-3" style={{ color: accentColor }} /> {header.city}</div>
+      <div className="bg-slate-900 text-white py-3 flex flex-wrap justify-center gap-x-10 gap-y-2 text-[10px] font-black uppercase tracking-[0.2em] px-8">
+         <div className="flex items-center gap-2 break-all"><AtSign className="h-3 w-3" style={{ color: accentColor }} /> {header.email}</div>
+         <div className="flex items-center gap-2 break-all"><Smartphone className="h-3 w-3" style={{ color: accentColor }} /> {header.phone}</div>
+         {header.profileLink && (<div className="flex items-center gap-2 break-all">{header.profileLabel || "Link"}:  {header.profileLink}</div>)}
+         <div className="flex items-center gap-2 break-all"><MapPin className="h-3 w-3" style={{ color: accentColor }} /> {header.city}</div>
       </div>
 
       <div className="p-16 grid grid-cols-12 gap-16">

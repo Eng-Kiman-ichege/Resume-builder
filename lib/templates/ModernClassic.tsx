@@ -17,32 +17,32 @@ export const ModernClassic = ({
   return (
     <div className="bg-white w-full h-full p-12 flex flex-col gap-10 font-sans text-slate-800">
       {/* Header */}
-      <header className="border-b-4 border-slate-900 pb-8 flex justify-between items-end">
-        <div>
-          <h1 className="text-5xl font-black tracking-tighter text-slate-900 uppercase flex gap-2">
+      <header className="border-b-4 border-slate-900 pb-8 flex justify-between items-end gap-4 overflow-hidden">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-5xl font-black tracking-tighter text-slate-900 uppercase flex flex-wrap gap-x-2 gap-y-1">
             <EditableText 
               value={header.firstName || "First"} 
               onUpdate={(val) => onUpdate?.("header", { ...header, firstName: val })}
-              className="px-1"
+              className="px-1 break-words"
             />
             <EditableText 
               value={header.surname || "Surname"} 
               onUpdate={(val) => onUpdate?.("header", { ...header, surname: val })}
               style={{ color: accentColor }}
-              className="px-1"
+              className="px-1 break-words"
             />
           </h1>
           <EditableText 
             value={header.jobTitle || "Professional Title"} 
             onUpdate={(val) => onUpdate?.("header", { ...header, jobTitle: val })}
-            className="text-xl font-bold text-slate-400 mt-2 uppercase tracking-[0.2em] px-1"
+            className="text-xl font-bold text-slate-400 mt-2 uppercase tracking-[0.2em] px-1 break-words"
           />
         </div>
-        <div className="text-right text-sm font-bold space-y-1 text-slate-500 uppercase tracking-wider">
-          <div className="flex items-center justify-end gap-2"><AtSign className="h-3.5 w-3.5" style={{ color: accentColor }} /> {header.email}</div>
-          <div className="flex items-center justify-end gap-2"><Smartphone className="h-3.5 w-3.5" style={{ color: accentColor }} /> {header.phone}</div>
-          {header.profileLink && (<div className="flex items-center justify-end gap-2">{header.profileLabel || "Link"}:  {header.profileLink}</div>)}
-          <div className="flex items-center justify-end gap-2"><MapPin className="h-3.5 w-3.5" style={{ color: accentColor }} /> {header.city}</div>
+        <div className="text-right text-sm font-bold space-y-1 text-slate-500 uppercase tracking-wider max-w-[40%] shrink-0">
+          <div className="flex items-center justify-end gap-2 break-all"><AtSign className="h-3.5 w-3.5" style={{ color: accentColor }} /> {header.email}</div>
+          <div className="flex items-center justify-end gap-2 break-all"><Smartphone className="h-3.5 w-3.5" style={{ color: accentColor }} /> {header.phone}</div>
+          {header.profileLink && (<div className="flex items-center justify-end gap-2 break-all">{header.profileLabel || "Link"}:  {header.profileLink}</div>)}
+          <div className="flex items-center justify-end gap-2 break-all"><MapPin className="h-3.5 w-3.5" style={{ color: accentColor }} /> {header.city}</div>
         </div>
       </header>
 
