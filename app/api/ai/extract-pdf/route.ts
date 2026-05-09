@@ -25,11 +25,15 @@ export async function POST(req: Request) {
 
     // Use pdfjs-dist legacy build for server-side compatibility
     const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+    const pdfjsWorker = await import("pdfjs-dist/legacy/build/pdf.worker.mjs");
     
-    const loadingTask = pdfjs.getDocument({
+    // Manually configure the worker
+    (pdfjs as any).GlobalWorkerOptions.workerSrc = pdfjsWorker;
+    
+    const loadingTask = (pdfjs as any).getDocument({
       data: buffer,
       useSystemFonts: true,
-      disableFontFace: true, // Speeds up text extraction
+      disableFontFace: true,
     });
     
     const pdf = await loadingTask.promise;
