@@ -10,6 +10,7 @@ export type ResumeData = {
   skills: { content: string };
   summary: { content: string };
   additional: any[];
+  id?: string;
   settings: {
     color: string;
     titleColor: string;
@@ -67,6 +68,7 @@ export function ResumeProvider({ children }: { children: React.ReactNode }) {
             skills: data.skills || { content: "" },
             summary: data.summary || { content: "" },
             additional: data.additional || [],
+            id: data.id,
             settings: data.settings || { 
               color: "#3b82f6", 
               titleColor: "#0f172a", 

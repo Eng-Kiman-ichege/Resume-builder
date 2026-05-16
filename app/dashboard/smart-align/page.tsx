@@ -11,7 +11,7 @@ import { useResume } from "@/lib/context/ResumeContext";
 
 export default function SmartAlignPage() {
   const router = useRouter();
-  const { refreshData } = useResume();
+  const { refreshData, resumeData } = useResume();
   const [cvText, setCvText] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -109,11 +109,10 @@ export default function SmartAlignPage() {
     
     setLoading(true);
     try {
-      // 2. Save the optimized data to the database
       const saveResponse = await fetch("/api/resume/save-all", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ resumeData: optimizedData }),
+        body: JSON.stringify({ resumeData: optimizedData, resumeId: resumeData?.id }),
       });
 
       if (!saveResponse.ok) {

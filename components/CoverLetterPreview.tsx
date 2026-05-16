@@ -81,6 +81,31 @@ export const CoverLetterPreview = forwardRef(({
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       
+      // --- ATS-Friendly Invisible Text Layer ---
+      pdf.setTextColor(0, 0, 0);
+      
+      let rawText = "";
+      if (coverLetterData?.sender) {
+        rawText += `${coverLetterData.sender.name || ""}\n`;
+        rawText += `${coverLetterData.sender.title || ""}\n`;
+        rawText += `${coverLetterData.sender.email || ""} | ${coverLetterData.sender.phone || ""}\n\n`;
+      }
+      if (coverLetterData?.recipient) {
+        rawText += `To: ${coverLetterData.recipient.name || ""}\n`;
+        rawText += `${coverLetterData.recipient.title || ""}\n`;
+        rawText += `${coverLetterData.recipient.company || ""}\n\n`;
+      }
+      if (coverLetterData?.letter) {
+        rawText += `${coverLetterData.letter}\n`;
+      }
+
+      if (rawText.trim()) {
+        pdf.setFontSize(10);
+        const lines = pdf.splitTextToSize(rawText.trim(), pdfWidth - 10);
+        pdf.text(lines, 5, 5);
+      }
+      // ------------------------------------------
+      
       pdf.addImage(dataUrl, "JPEG", 0, 0, pdfWidth, pdfHeight);
       
       if (action === "print") {

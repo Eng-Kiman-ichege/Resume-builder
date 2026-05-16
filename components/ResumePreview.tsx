@@ -97,6 +97,49 @@ export const ResumePreview = forwardRef(({
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       
+      // --- ATS-Friendly Invisible Text Layer ---
+      // We extract all text and embed it behind the image so PDF scanners can read it.
+      pdf.setTextColor(0, 0, 0); 
+      
+      // --- ATS-Friendly Invisible Text Layer ---
+      // We build the text directly from the data object to guarantee extraction.
+      pdf.setTextColor(0, 0, 0); 
+      
+      let rawText = "";
+      if (currentData.header) {
+        rawText += `${currentData.header.firstName || ""} ${currentData.header.surname || ""}\n`;
+        rawText += `${currentData.header.jobTitle || ""}\n`;
+        rawText += `${currentData.header.email || ""} | ${currentData.header.phone || ""} | ${currentData.header.city || ""}, ${currentData.header.country || ""}\n\n`;
+      }
+      if (currentData.summary?.content) {
+        rawText += `Summary\n${currentData.summary.content}\n\n`;
+      }
+      if (currentData.experience?.length) {
+        rawText += `Experience\n`;
+        currentData.experience.forEach((exp: any) => {
+          rawText += `${exp.jobTitle || ""} at ${exp.employer || ""}\n`;
+          rawText += `${exp.startYear || ""} - ${exp.endYear || "Present"}\n`;
+          rawText += `${exp.description || ""}\n\n`;
+        });
+      }
+      if (currentData.education?.length) {
+        rawText += `Education\n`;
+        currentData.education.forEach((edu: any) => {
+          rawText += `${edu.degree || ""} ${edu.field ? "in " + edu.field : ""} at ${edu.institution || ""}\n`;
+          rawText += `${edu.startYear || ""} - ${edu.endYear || ""}\n\n`;
+        });
+      }
+      if (currentData.skills?.content) {
+        rawText += `Skills\n${currentData.skills.content}\n\n`;
+      }
+
+      if (rawText.trim()) {
+        pdf.setFontSize(10);
+        const lines = pdf.splitTextToSize(rawText.trim(), pdfWidth - 10);
+        pdf.text(lines, 5, 5);
+      }
+      // ------------------------------------------
+      
       pdf.addImage(dataUrl, "JPEG", 0, 0, pdfWidth, pdfHeight);
       
       if (action === "print") {

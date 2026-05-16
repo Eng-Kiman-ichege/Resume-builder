@@ -34,11 +34,13 @@ export async function POST(req: Request) {
         .from("resumes")
         .update(payload)
         .eq("id", resumeId)
-        .eq("user_id", userId);
+        .eq("user_id", userId)
+        .select();
     } else {
       result = await supabase
         .from("resumes")
-        .insert(payload);
+        .insert(payload)
+        .select();
     }
 
     if (result.error) {
