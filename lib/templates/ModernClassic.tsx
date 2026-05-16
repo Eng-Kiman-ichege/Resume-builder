@@ -15,11 +15,11 @@ export const ModernClassic = ({
   const accentColor = settings?.color || "#3b82f6";
 
   return (
-    <div className="bg-white w-full h-full p-12 flex flex-col gap-10 font-sans text-slate-800">
+    <div className="bg-white w-full h-full p-8 flex flex-col gap-6 font-sans text-slate-800">
       {/* Header */}
-      <header className="border-b-4 border-slate-900 pb-8 flex justify-between items-end gap-4 overflow-hidden">
+      <header className="border-b-4 border-slate-900 pb-4 flex justify-between items-end gap-4 overflow-hidden">
         <div className="flex-1 min-w-0">
-          <h1 className="text-5xl font-black tracking-tighter text-slate-900 uppercase flex flex-wrap gap-x-2 gap-y-1">
+          <h1 className="text-4xl font-black tracking-tighter text-slate-900 uppercase flex flex-wrap gap-x-2 gap-y-1">
             <EditableText 
               value={header.firstName || "First"} 
               onUpdate={(val) => onUpdate?.("header", { ...header, firstName: val })}
@@ -65,7 +65,7 @@ export const ModernClassic = ({
 
       {/* Summary */}
       <section>
-        <h2 className="text-xs font-black uppercase tracking-[0.4em] text-slate-300 mb-4">Professional Summary</h2>
+        <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-2">Professional Summary</h2>
         <EditableText 
           value={summary.content} 
           onUpdate={(val) => onUpdate?.("summary", { ...summary, content: val })}
@@ -77,8 +77,8 @@ export const ModernClassic = ({
 
       {/* Experience */}
       <section>
-        <h2 className="text-xs font-black uppercase tracking-[0.4em] text-slate-300 mb-8">Work Experience</h2>
-        <div className="space-y-10">
+        <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-4">Work Experience</h2>
+        <div className="space-y-6">
           {experience.map((exp, i) => (
             <div key={i} className="group relative pl-8 border-l-2 border-slate-50">
               <div 
@@ -142,7 +142,7 @@ export const ModernClassic = ({
 
       {/* Skills */}
       <section>
-        <h2 className="text-xs font-black uppercase tracking-[0.4em] text-slate-300 mb-4">Core Expertise</h2>
+        <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-2">Core Expertise</h2>
         <EditableText 
           value={skills.content} 
           onUpdate={(val) => onUpdate?.("skills", { ...skills, content: val })}
@@ -153,8 +153,8 @@ export const ModernClassic = ({
 
       {/* Education */}
       <section>
-        <h2 className="text-xs font-black uppercase tracking-[0.4em] text-slate-300 mb-8">Education</h2>
-        <div className="space-y-6">
+        <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-4">Education</h2>
+        <div className="space-y-4">
           {education.map((edu, i) => (
             <div key={i} className="flex justify-between items-start">
               <div className="flex-1">

@@ -6,7 +6,7 @@ import { useContext } from "react";
 import { Sparkles, Loader2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getTemplateComponent } from "@/lib/templates";
-import { toPng } from "html-to-image";
+import { toPng, toJpeg } from "html-to-image";
 import jsPDF from "jspdf";
 import { usePathname } from "next/navigation";
 
@@ -48,6 +48,9 @@ export const ResumePreview = forwardRef(({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const resumeRef = useRef<HTMLDivElement>(null);
+  // Auto-scale inner content to strictly fit within A4 height (1 page)
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [innerScale, setInnerScale] = useState(1);
 
   // Compute scale so the full A4 width fits the available container width
   useEffect(() => {
@@ -76,24 +79,25 @@ export const ResumePreview = forwardRef(({
       // Wait for DOM to register transform reset (optional, but safer)
       await new Promise(resolve => setTimeout(resolve, 0));
       
-      const dataUrl = await toPng(resumeRef.current, {
-        pixelRatio: 2,
+      const dataUrl = await toJpeg(resumeRef.current, {
+        quality: 1.0,
+        pixelRatio: 3,
         backgroundColor: "#ffffff",
         style: {
           transform: "none",
         }
       });
       
-      const elementHeight = resumeRef.current.offsetHeight;
-      const elementWidth = resumeRef.current.offsetWidth;
+      const elementHeight = A4_H; // Since we auto-scale, we capture exactly A4 height
+      const elementWidth = A4_W;
       
       resumeRef.current.style.transform = originalTransform;
       
       const pdf = new jsPDF("p", "mm", "a4");
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (elementHeight * pdfWidth) / elementWidth;
+      const pdfHeight = pdf.internal.pageSize.getHeight();
       
-      pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.addImage(dataUrl, "JPEG", 0, 0, pdfWidth, pdfHeight);
       
       if (action === "print") {
         pdf.autoPrint();
@@ -158,6 +162,26 @@ export const ResumePreview = forwardRef(({
       : resumeData.education,
   };
 
+  useEffect(() => {
+    const checkHeight = () => {
+      if (!contentRef.current) return;
+      // Reset transform to measure raw height
+      contentRef.current.style.transform = "none";
+      const scrollHeight = contentRef.current.scrollHeight;
+      
+      if (scrollHeight > A4_H) {
+        // Leave a tiny margin of error so it doesn't clip
+        setInnerScale((A4_H - 10) / scrollHeight);
+      } else {
+        setInnerScale(1);
+      }
+    };
+    
+    // Slight delay to allow DOM to render new content before measuring
+    const timeoutId = setTimeout(checkHeight, 50);
+    return () => clearTimeout(timeoutId);
+  }, [currentData, activeTemplateId]);
+
   // Outer wrapper = scaled pixel dimensions so it takes up exactly the right space
   const scaledW = A4_W * scale;
   const scaledH = A4_H * scale;
@@ -208,10 +232,19 @@ export const ResumePreview = forwardRef(({
           }}
           className="bg-white"
         >
-          <TemplateComponent 
-            data={currentData} 
-            onUpdate={handleLiveUpdate}
-          />
+          <div
+            ref={contentRef}
+            style={{
+              width: "100%",
+              transform: `scale(${innerScale})`,
+              transformOrigin: "top left",
+            }}
+          >
+            <TemplateComponent 
+              data={currentData} 
+              onUpdate={handleLiveUpdate}
+            />
+          </div>
         </div>
       </div>
 

@@ -6,7 +6,7 @@ import { useContext } from "react";
 import { Loader2, Download, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getCoverLetterTemplate } from "@/lib/cover-letter-templates";
-import { toPng } from "html-to-image";
+import { toPng, toJpeg } from "html-to-image";
 import jsPDF from "jspdf";
 
 const A4_W = 794;  // A4 width in px at 96 dpi
@@ -26,6 +26,26 @@ export const CoverLetterPreview = forwardRef(({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const letterRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [innerScale, setInnerScale] = useState(1);
+
+  // Auto-scale inner content to strictly fit within A4 height (1 page)
+  useEffect(() => {
+    const checkHeight = () => {
+      if (!contentRef.current) return;
+      contentRef.current.style.transform = "none";
+      const scrollHeight = contentRef.current.scrollHeight;
+      
+      if (scrollHeight > A4_H) {
+        setInnerScale((A4_H - 10) / scrollHeight);
+      } else {
+        setInnerScale(1);
+      }
+    };
+    
+    const timeoutId = setTimeout(checkHeight, 50);
+    return () => clearTimeout(timeoutId);
+  }, [coverLetterData]);
 
   useEffect(() => {
     const updateScale = () => {
@@ -47,20 +67,21 @@ export const CoverLetterPreview = forwardRef(({
       letterRef.current.style.transform = "none";
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      const dataUrl = await toPng(letterRef.current, {
-        pixelRatio: 2,
+      const dataUrl = await toJpeg(letterRef.current, {
+        quality: 1.0,
+        pixelRatio: 3,
         backgroundColor: "#ffffff",
       });
       
-      const elementHeight = letterRef.current.offsetHeight;
-      const elementWidth = letterRef.current.offsetWidth;
+      const elementHeight = A4_H;
+      const elementWidth = A4_W;
       letterRef.current.style.transform = originalTransform;
       
       const pdf = new jsPDF("p", "mm", "a4");
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (elementHeight * pdfWidth) / elementWidth;
+      const pdfHeight = pdf.internal.pageSize.getHeight();
       
-      pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.addImage(dataUrl, "JPEG", 0, 0, pdfWidth, pdfHeight);
       
       if (action === "print") {
         pdf.autoPrint();
@@ -113,7 +134,16 @@ export const CoverLetterPreview = forwardRef(({
           }}
           className="bg-white"
         >
-          <TemplateComponent data={coverLetterData} />
+          <div
+            ref={contentRef}
+            style={{
+              width: "100%",
+              transform: `scale(${innerScale})`,
+              transformOrigin: "top left",
+            }}
+          >
+            <TemplateComponent data={coverLetterData} />
+          </div>
         </div>
       </div>
     </div>

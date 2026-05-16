@@ -30,12 +30,14 @@ export async function POST(req: Request) {
         .from("resumes")
         .update(updateData)
         .eq("id", resumeId)
-        .eq("user_id", userId);
+        .eq("user_id", userId)
+        .select();
     } else {
       // Create new resume (Auto-save behavior)
       result = await supabase
         .from("resumes")
-        .insert(updateData);
+        .insert(updateData)
+        .select();
     }
 
     if (result.error) {

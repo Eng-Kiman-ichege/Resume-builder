@@ -74,7 +74,7 @@ export default function BuilderPage() {
 
 
   return (
-    <div className="flex flex-col h-full w-full bg-white dark:bg-zinc-950">
+    <div className="flex flex-col h-screen w-full bg-white dark:bg-zinc-950">
       {/* Top Main Content Area */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden min-h-0">
         

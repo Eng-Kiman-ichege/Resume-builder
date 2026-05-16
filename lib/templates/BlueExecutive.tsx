@@ -17,8 +17,8 @@ export const BlueExecutive = ({
   return (
     <div className="bg-white w-full h-full flex flex-col font-serif text-slate-900">
       {/* Top Banner */}
-      <header className="text-white p-12 text-center flex flex-col items-center" style={{ backgroundColor: accentColor }}>
-        <h1 className="text-5xl font-bold tracking-tight mb-2 uppercase flex flex-wrap justify-center gap-4 px-8">
+      <header className="text-white p-8 text-center flex flex-col items-center" style={{ backgroundColor: accentColor }}>
+        <h1 className="text-4xl font-bold tracking-tight mb-2 uppercase flex flex-wrap justify-center gap-4 px-8">
           <EditableText 
             value={header.firstName || "First"} 
             onUpdate={(val) => onUpdate?.("header", { ...header, firstName: val })}
@@ -31,11 +31,11 @@ export const BlueExecutive = ({
           />
         </h1>
         <div className="w-20 h-1 bg-white/30 rounded-full mb-6" />
-        <EditableText 
-          value={header.jobTitle || "Professional Title"} 
-          onUpdate={(val) => onUpdate?.("header", { ...header, jobTitle: val })}
-          className="text-lg tracking-[0.4em] opacity-80 font-medium uppercase italic px-4 py-1 break-words max-w-2xl"
-        />
+          <EditableText 
+            value={header.jobTitle || "Professional Title"} 
+            onUpdate={(val) => onUpdate?.("header", { ...header, jobTitle: val })}
+            className="text-base tracking-[0.4em] opacity-80 font-medium uppercase italic px-4 py-1 break-words max-w-2xl"
+          />
       </header>
       
       {/* Floating Contact Bar ... */}
@@ -64,10 +64,10 @@ export const BlueExecutive = ({
          </div>
       </div>
 
-      <div className="p-16 grid grid-cols-12 gap-16">
-        <div className="col-span-12 space-y-16">
+      <div className="p-10 grid grid-cols-12 gap-8">
+        <div className="col-span-12 space-y-10">
           <section>
-            <h2 className="text-[11px] font-black uppercase tracking-[0.5em] mb-8 pb-2 border-b-2 border-slate-100" style={{ color: accentColor }}>Executive Profile</h2>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.5em] mb-4 pb-2 border-b-2 border-slate-100" style={{ color: accentColor }}>Executive Profile</h2>
             <EditableText 
               value={summary.content} 
               onUpdate={(val) => onUpdate?.("summary", { ...summary, content: val })}
@@ -77,20 +77,20 @@ export const BlueExecutive = ({
           </section>
 
           <section>
-            <h2 className="text-[11px] font-black uppercase tracking-[0.5em] mb-10 pb-2 border-b-2 border-slate-100" style={{ color: accentColor }}>Professional Experience</h2>
-            <div className="space-y-12">
+            <h2 className="text-[10px] font-black uppercase tracking-[0.5em] mb-6 pb-2 border-b-2 border-slate-100" style={{ color: accentColor }}>Professional Experience</h2>
+            <div className="space-y-8">
               {experience.map((exp, i) => (
                 <div key={i} className="space-y-3">
                   <div className="flex justify-between items-baseline font-bold">
-                    <EditableText 
-                      value={exp.jobTitle || "Job Title"} 
-                      onUpdate={(val) => {
-                        const newExperience = [...experience];
-                        newExperience[i] = { ...newExperience[i], jobTitle: val };
-                        onUpdate?.("experience", newExperience);
-                      }}
-                      className="text-2xl text-slate-900 tracking-tight leading-tight break-words pr-4"
-                    />
+                      <EditableText 
+                        value={exp.jobTitle || "Job Title"} 
+                        onUpdate={(val) => {
+                          const newExperience = [...experience];
+                          newExperience[i] = { ...newExperience[i], jobTitle: val };
+                          onUpdate?.("experience", newExperience);
+                        }}
+                        className="text-xl text-slate-900 tracking-tight leading-tight break-words pr-4"
+                      />
                     <div className="text-xs text-slate-400 font-black flex gap-1">
                       <EditableText 
                         value={exp.startYear || "Start"} 
@@ -136,8 +136,8 @@ export const BlueExecutive = ({
           </section>
 
           <section>
-             <h2 className="text-[11px] font-black uppercase tracking-[0.5em] mb-8 pb-2 border-b-2 border-slate-100" style={{ color: accentColor }}>Academic Background</h2>
-             <div className="grid grid-cols-2 gap-8">
+             <h2 className="text-[10px] font-black uppercase tracking-[0.5em] mb-6 pb-2 border-b-2 border-slate-100" style={{ color: accentColor }}>Academic Background</h2>
+             <div className="grid grid-cols-2 gap-6">
                {education.map((edu, i) => (
                  <div key={i} className="space-y-1">
                     <EditableText 

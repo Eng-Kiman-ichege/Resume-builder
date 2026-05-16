@@ -23,7 +23,7 @@ import { Seattle } from "./Seattle";
 import { ResumeData } from "@/lib/context/ResumeContext";
 
 export const TEMPLATES = {
-  // Core Collection
+  // Core Collection (Strictly unique designs)
   "modern-classic": ModernClassic,
   "blue-executive": BlueExecutive,
   "minimalist": Minimalist,
@@ -32,29 +32,6 @@ export const TEMPLATES = {
   "paris": Paris,
   "tokyo": Tokyo,
   "new-york": NewYork,
-  
-  // Executive Series
-  "executive-gold": BlueExecutive,
-  "corporate-pro": London,
-  "director-slate": ModernClassic,
-  "ceo-premium": NewYork,
-  "board-member": Paris,
-  
-  // Creative Series
-  "creative-neon": Seattle,
-  "design-studio": Tokyo,
-  "portfolio-bold": NewYork,
-  "art-director": Berlin,
-  "agency-pro": Sydney,
-  
-  // Minimal Series
-  "clean-canvas": Minimalist,
-  "simple-light": London,
-  "pure-white": Paris,
-  "minimal-plus": Toronto,
-  "zen-resume": Seoul,
-  
-  // Professional Cities
   "berlin": Berlin,
   "sydney": Sydney,
   "toronto": Toronto,
@@ -67,30 +44,6 @@ export const TEMPLATES = {
   "stockholm": Stockholm,
   "madrid": Madrid,
   "austin": Austin,
-  
-  // Specialized
-  "tech-innovator": Seattle,
-  "sales-master": BlueExecutive,
-  "marketing-hero": Tokyo,
-  "legal-advisor": London,
-  "medical-pro": Toronto,
-  "finance-elite": ModernClassic,
-  "academic-bright": NewYork,
-  "non-profit": Barcelona,
-  "startup-vibe": Austin,
-  "freelance-flow": Madrid,
-  
-  // Global Edition
-  "dubai": BlueExecutive,
-  "hong-kong": Tokyo,
-  "shanghai": London,
-  "london-dark": London,
-  "paris-nights": Paris,
-  "tokyo-drift": Tokyo,
-  "ny-loft": NewYork,
-  "sf-tech": Seattle,
-  "austin-sun": Austin,
-  "miami-vice": Seattle,
 } as const;
 
 export const colors = [
@@ -121,11 +74,11 @@ export function getTemplateComponent(id: string) {
     }
   }
   
-  // Specific fallbacks for common names
-  if (normalizedId.includes("olivia") || normalizedId.includes("sanchez")) return TEMPLATES["blue-executive"];
-  if (normalizedId.includes("creative")) return TEMPLATES["barcelona"];
-  if (normalizedId.includes("corporate")) return TEMPLATES["new-york"];
-  if (normalizedId.includes("professional")) return TEMPLATES["london"];
+  // Specific fallbacks for common names if user had an old template ID saved
+  if (normalizedId.includes("executive") || normalizedId.includes("olivia")) return TEMPLATES["blue-executive"];
+  if (normalizedId.includes("creative") || normalizedId.includes("neon")) return TEMPLATES["seattle"];
+  if (normalizedId.includes("corporate")) return TEMPLATES["london"];
+  if (normalizedId.includes("minimal")) return TEMPLATES["minimalist"];
 
   // Default fallback
   return TEMPLATES["modern-classic"];
